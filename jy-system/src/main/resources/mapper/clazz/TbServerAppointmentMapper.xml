@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jy.system.mapper.TbServerAppointmentMapper">
+    
+    <resultMap type="TbServerAppointment" id="TbServerAppointmentResult">
+        <result property="id"    column="id"    />
+        <result property="stuId"    column="stu_id"    />
+        <result property="stuname"    column="stuname"    />
+        <result property="telephone"    column="telephone"    />
+        <result property="qqnumber"    column="qqnumber"    />
+        <result property="appointtime"    column="appointtime"    />
+        <result property="createtime"    column="createtime"    />
+        <result property="description"    column="description"    />
+        <result property="empId"    column="emp_id"    />
+        <result property="isfoul"    column="isfoul"    />
+    </resultMap>
+	
+	<sql id="selectTbServerAppointmentVo">
+        select id, stu_id, stuname, telephone, qqnumber, appointtime, createtime, description, emp_id from tb_server_appointment
+    </sql>
+	
+    <select id="selectTbServerAppointmentList" parameterType="TbServerAppointment" resultMap="TbServerAppointmentResult">
+        <include refid="selectTbServerAppointmentVo"/>
+        <where>  
+            <if test="id != null  and id != '' "> and id = #{id}</if>
+             <if test="stuId != null  and stuId != '' "> and stu_id = #{stuId}</if>
+             <if test="stuname != null  and stuname != '' "> and stuname = #{stuname}</if>
+             <if test="telephone != null  and telephone != '' "> and telephone = #{telephone}</if>
+             <if test="qqnumber != null  and qqnumber != '' "> and qqnumber = #{qqnumber}</if>
+             <if test="appointtime != null  and appointtime != '' "> and appointtime = #{appointtime}</if>
+             <if test="createtime != null  and createtime != '' "> and createtime = #{createtime}</if>
+             <if test="description != null  and description != '' "> and description = #{description}</if>
+             <if test="empId != null  and empId != '' "> and emp_id = #{empId}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbServerAppointmentById" parameterType="String" resultMap="TbServerAppointmentResult">
+        <include refid="selectTbServerAppointmentVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertTbServerAppointment" parameterType="TbServerAppointment">
+        insert into tb_server_appointment
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">id,</if>
+			<if test="stuId != null  and stuId != ''  ">stu_id,</if>
+			<if test="stuname != null  and stuname != ''  ">stuname,</if>
+			<if test="telephone != null  and telephone != ''  ">telephone,</if>
+			<if test="qqnumber != null  and qqnumber != ''  ">qqnumber,</if>
+			<if test="appointtime != null  and appointtime != ''  ">appointtime,</if>
+			<if test="createtime != null  and createtime != ''  ">createtime,</if>
+			<if test="description != null  and description != ''  ">description,</if>
+			<if test="empId != null  and empId != ''  ">emp_id,</if>
+			<if test="isfoul != null  and isfoul != ''  ">isfoul,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">#{id},</if>
+			<if test="stuId != null  and stuId != ''  ">#{stuId},</if>
+			<if test="stuname != null  and stuname != ''  ">#{stuname},</if>
+			<if test="telephone != null  and telephone != ''  ">#{telephone},</if>
+			<if test="qqnumber != null  and qqnumber != ''  ">#{qqnumber},</if>
+			<if test="appointtime != null  and appointtime != ''  ">#{appointtime},</if>
+			<if test="createtime != null  and createtime != ''  ">#{createtime},</if>
+			<if test="description != null  and description != ''  ">#{description},</if>
+			<if test="empId != null  and empId != ''  ">#{empId},</if>
+			<if test="isfoul != null  and isfoul != ''  ">#{isfoul},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbServerAppointment" parameterType="TbServerAppointment">
+        update tb_server_appointment
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="stuId != null  and stuId != ''  ">stu_id = #{stuId},</if>
+            <if test="stuname != null  and stuname != ''  ">stuname = #{stuname},</if>
+            <if test="telephone != null  and telephone != ''  ">telephone = #{telephone},</if>
+            <if test="qqnumber != null  and qqnumber != ''  ">qqnumber = #{qqnumber},</if>
+            <if test="appointtime != null  and appointtime != ''  ">appointtime = #{appointtime},</if>
+            <if test="createtime != null  and createtime != ''  ">createtime = #{createtime},</if>
+            <if test="description != null  and description != ''  ">description = #{description},</if>
+            <if test="empId != null  and empId != ''  ">emp_id = #{empId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteTbServerAppointmentById" parameterType="String">
+        delete from tb_server_appointment where id = #{id}
+    </delete>
+	
+    <delete id="deleteTbServerAppointmentByIds" parameterType="String">
+        delete from tb_server_appointment where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectTbServerAppointmentAll" parameterType="com.jy.system.domain.TbServerAppointment" resultType="com.jy.system.domain.vo.TbStuAppointmentVO">
+        SELECT
+            tsa.appointtime,
+            tsa.createtime,
+            tsa.description,
+            tsa.isfoul,
+            su.user_name AS empName
+        FROM
+            tb_server_appointment tsa
+            LEFT JOIN sys_user su ON tsa.`emp_id` = su.user_id
+        WHERE
+            tsa.stu_id = #{stuId} order by tsa.createtime desc
+    </select>
+
+    
+</mapper>

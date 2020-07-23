@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jy.system.mapper.TbSubjectMapper">
+    
+    <resultMap type="TbSubject" id="TbSubjectResult">
+        <result property="subjectId"    column="subject_id"    />
+        <result property="subjectName"    column="subject_name"    />
+        <result property="subjectday"    column="subjectday"    />
+        <result property="one"    column="one"    />
+        <result property="tow"    column="tow"    />
+        <result property="three"    column="three"    />
+
+    </resultMap>
+	
+	<sql id="selectTbSubjectVo">
+        select subject_id, subject_name,subjectday,one,tow,three from tb_subject
+    </sql>
+	
+    <select id="selectTbSubjectList" parameterType="TbSubject" resultMap="TbSubjectResult">
+        <include refid="selectTbSubjectVo"/>
+        <where>  
+            <if test="subjectId != null  and subjectId != '' "> and subject_id = #{subjectId}</if>
+             <if test="subjectName != null  and subjectName != '' "> and subject_name = #{subjectName}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbSubjectById" parameterType="String" resultMap="TbSubjectResult">
+        <include refid="selectTbSubjectVo"/>
+        where subject_id = #{subjectId}
+    </select>
+
+    <select id="TbSubjectList" resultMap="TbSubjectResult">
+        <include refid="selectTbSubjectVo"/>
+    </select>
+        
+    <insert id="insertTbSubject" parameterType="TbSubject">
+        insert into tb_subject
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="subjectId != null  and subjectId != ''  ">subject_id,</if>
+			<if test="subjectName != null  and subjectName != ''  ">subject_name,</if>
+			<if test="subjectday != null  and subjectday != ''  ">subjectday,</if>
+			<if test="one != null  and one != ''  ">one,</if>
+			<if test="tow != null  and tow != ''  ">tow,</if>
+			<if test="three != null  and three != ''  ">three,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="subjectId != null  and subjectId != ''  ">#{subjectId},</if>
+			<if test="subjectName != null  and subjectName != ''  ">#{subjectName},</if>
+			<if test="subjectday != null  and subjectday != ''  ">#{subjectday},</if>
+            <if test="one != null  and one != ''  ">#{one},</if>
+            <if test="tow != null  and tow != ''  ">#{tow},</if>
+            <if test="three != null  and three != ''  ">#{three},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbSubject" parameterType="TbSubject">
+        update tb_subject
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="subjectName != null  and subjectName != ''  ">subject_name = #{subjectName},</if>
+            <if test="subjectday != null  and subjectday != ''  ">subjectday = #{subjectday},</if>
+            <if test="one != null  and one != ''  ">one = #{one},</if>
+            <if test="tow != null  and tow != ''  ">tow = #{tow},</if>
+            <if test="three != null  and three != ''  ">three = #{three},</if>
+        </trim>
+        where subject_id = #{subjectId}
+    </update>
+
+	<delete id="deleteTbSubjectById" parameterType="String">
+        delete from tb_subject where subject_id = #{subjectId}
+    </delete>
+	
+    <delete id="deleteTbSubjectByIds" parameterType="String">
+        delete from tb_subject where subject_id in 
+        <foreach item="subjectId" collection="array" open="(" separator="," close=")">
+            #{subjectId}
+        </foreach>
+    </delete>
+    
+</mapper>

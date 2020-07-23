@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jy.system.mapper.BaseClazzMapper">
+
+    <resultMap type="BaseClazz" id="TbBaseClazzResult">
+        <result property="clazzId"    column="clazz_id"    />
+        <result property="clazzname"    column="clazzname"    />
+        <result property="studentcount"    column="studentcount"    />
+        <result property="subjectId"    column="subject_id"    />
+        <result property="subjectname"    column="subjectname"    />
+        <result property="begintime"    column="begintime"    />
+        <result property="endtime"    column="endtime"    />
+        <result property="workday"    column="workday"    />
+        <result property="workdaytime"    column="workdaytime"    />
+        <result property="headmasterName"    column="headmasterName"    />
+        <result property="campusId"    column="campusId"    />
+        <result property="isdelete"    column="isdelete"    />
+        <result property="isvalid"    column="isvalid"    />
+        <result property="assistantname"    column="assistantname"    />
+        <result property="lecturername"    column="lecturername"    />
+        <result property="lossrateone"    column="Lossrateone"    />
+        <result property="lossratetwo"    column="Lossratetwo"    />
+    </resultMap>
+
+    <sql id="selectTbBaseClazzVo">
+        select clazz_id, clazzname, studentcount, subject_id, subjectname, begintime, endtime, workday, workdaytime, headmasterName, campusId, isdelete, isvalid, assistantname, lecturername, Lossrateone, Lossratetwo from tb_base_clazz
+    </sql>
+
+    <select id="selectBaseClazzList" parameterType="BaseClazz" resultMap="TbBaseClazzResult">
+        <include refid="selectTbBaseClazzVo"/>
+        <where>
+            <if test="clazzId != null  and clazzId != '' "> and clazz_id = #{clazzId}</if>
+            <if test="clazzname != null  and clazzname != '' "> and clazzname = #{clazzname}</if>
+            <if test="studentcount != null "> and studentcount = #{studentcount}</if>
+            <if test="subjectId != null  and subjectId != '' "> and subject_id = #{subjectId}</if>
+            <if test="subjectname != null  and subjectname != '' "> and subjectname = #{subjectname}</if>
+            <if test="begintime != null  and begintime != '' "> and begintime = #{begintime}</if>
+            <if test="endtime != null  and endtime != '' "> and endtime = #{endtime}</if>
+            <if test="workday != null  and workday != '' "> and workday = #{workday}</if>
+            <if test="workdaytime != null  and workdaytime != '' "> and workdaytime = #{workdaytime}</if>
+            <if test="headmasterName != null  and headmasterName != '' "> and headmasterName = #{headmasterName}</if>
+            <if test="campusId != null  and campusId != '' "> and campusId = #{campusId}</if>
+            <if test="isdelete != null "> and isdelete = #{isdelete}</if>
+            <if test="isvalid != null "> and isvalid = #{isvalid}</if>
+            <if test="assistantname != null  and assistantname != '' "> and assistantname = #{assistantname}</if>
+            <if test="lecturername != null  and lecturername != '' "> and lecturername = #{lecturername}</if>
+            <if test="lossrateone != null  and lossrateone != '' "> and Lossrateone = #{lossrateone}</if>
+            <if test="lossratetwo != null  and lossratetwo != '' "> and Lossratetwo = #{lossratetwo}</if>
+        </where>
+    </select>
+
+    <select id="selectBaseClazzById" parameterType="String" resultMap="TbBaseClazzResult">
+        <include refid="selectTbBaseClazzVo"/>
+        where clazz_id = #{clazzId}
+    </select>
+
+    <select id="selectServiceProcessById" parameterType="ServiceProcessVO" resultType="ServiceProcessVO">
+        SELECT
+            bc.clazz_id clazzid,
+            bc.subject_id subjectid,
+            bc.subjectname,
+            bc.clazzname,
+            count( bs.stu_id ) clazzSize,
+            bc.headmasterName,
+            su.user_name empname,
+            ROUND((getCount(bc.clazz_id) / count( bs.stu_id ) * 100 ),2 ) category,
+            sum( bs.violationOfDiscipline ) violationOfDiscipline,
+            bc.Estimate
+        FROM
+            tb_base_clazz bc
+            LEFT JOIN tb_base_stu_clazz bsc ON bc.clazz_id = bsc.clazz_id
+            LEFT JOIN tb_base_studentinfo bs ON bsc.stu_id = bs.stu_id
+            LEFT JOIN sys_user su ON bc.empname = su.user_id
+        WHERE
+            bc.isprocess = '1'
+        GROUP BY
+            bc.subjectname,
+            bc.clazzname DESC
+    </select>
+
+    <!-- 查询基础班班级数据-->
+    <select id="selectBaseClazzListAll" parameterType="BaseClazzVO" resultType="BaseClazzVO">
+        SELECT h.clazz as classSize,h.subjectname,h.subjectId,h.clazzname,h.clazzId,h.begintime,h.endtime,h.workday,h.brand,h.rateEmployment,h.headmasterName,h.assistantname,h.lecturername,h.Lossrateone,h.Lossratetwo FROM (
+        SELECT i.* ,FORMAT(SUM(i.brand) / SUM(i.classSize-i.remarkshr)*100,2) AS rateEmployment,i.subject_id as subjectId  ,sum(i.classSize-i.remarkshr) as clazz FROM (
+        SELECT b.*,(SELECT COUNT(remarkshr) AS Sizes FROM tb_base_clazz tc
+        LEFT JOIN tb_base_stu_clazz sc ON tc.clazz_id = sc.clazz_id
+        LEFT JOIN tb_base_studentinfo s ON sc.stu_id = s.stu_id
+        WHERE s.remarkshr IS NOT NULL AND tc.clazz_id =b.clazzId
+        ) AS remarkshr FROM  (
+        SELECT COUNT(*) AS classSize,tc.subjectname,CAST(tc.clazzname AS SIGNED INTEGER) clazzname,tc.clazz_id AS clazzId,tc.begintime,tc.endtime,tc.headmasterName,tc.assistantname,tc.lecturername,
+        IF((SELECT DATEDIFF(STR_TO_DATE(tc.endtime,'%Y-%m-%d '),CURTIME()))>'0',(SELECT DATEDIFF(STR_TO_DATE(tc.endtime,'%Y-%m-%d '),CURTIME())),
+        (select if((select (((select DATEDIFF(curdate(),tc.endtime))-(select COUNT(*) from
+        tb_workday f where f.holiday_date > tc.endtime and f.holiday_date &lt; curdate())))) > 44,
+        0,44-
+        (select (((select DATEDIFF(curdate(),tc.endtime))-(select COUNT(*) from
+        tb_workday f where f.holiday_date > tc.endtime and f.holiday_date &lt; curdate()))) as count)))) AS workday ,
+        IF((SELECT COUNT(*)  FROM tb_base_clazz c
+        LEFT JOIN tb_base_stu_clazz sc ON c.clazz_id = sc.clazz_id
+        LEFT JOIN tb_base_studentinfo s ON sc.stu_id = s.stu_id
+        WHERE s.outOfContact = 1 AND c.clazz_id = tc.clazz_id GROUP BY tc.clazz_id
+        ) <![CDATA[ <> ]]> "",(SELECT COUNT(*) FROM tb_base_clazz c
+        LEFT JOIN tb_base_stu_clazz sc ON c.clazz_id = sc.clazz_id
+        LEFT JOIN tb_base_studentinfo s ON sc.stu_id = s.stu_id
+        WHERE s.outOfContact = 1 AND c.clazz_id = tc.clazz_id GROUP BY tc.clazz_id
+        ),0) AS brand,tc.Lossrateone,tc.Lossratetwo,tc.subject_id
+        FROM tb_base_clazz tc
+        LEFT JOIN tb_base_stu_clazz sc ON tc.clazz_id = sc.clazz_id
+        LEFT JOIN tb_base_studentinfo s ON sc.stu_id = s.stu_id
+        WHERE 1=1 GROUP BY tc.clazz_id )AS b ORDER BY b.clazzname DESC
+        ) AS i GROUP BY i.clazzId ) AS h
+        <where>
+            <if test="clazzId!=null and clazzId!='' ">
+                1=1 AND h.clazzId = #{clazzId}
+            </if>
+            <if test="subjectId!=null and subjectId!='' and subjectId!='all'">
+                1=1 AND h.subjectId LIKE CONCAT('%',#{subjectId},'%')
+            </if>
+        </where>
+        ORDER BY h.subjectname ASC,h.clazzname DESC
+    </select>
+
+
+    <insert id="insertBaseClazz" parameterType="BaseClazz">
+        insert into tb_base_clazz
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="clazzId != null  and clazzId != ''  ">clazz_id,</if>
+            <if test="clazzname != null  and clazzname != ''  ">clazzname,</if>
+            <if test="studentcount != null  ">studentcount,</if>
+            <if test="subjectId != null  and subjectId != ''  ">subject_id,</if>
+            <if test="subjectname != null  and subjectname != ''  ">subjectname,</if>
+            <if test="begintime != null  and begintime != ''  ">begintime,</if>
+            <if test="endtime != null  and endtime != ''  ">endtime,</if>
+            <if test="workday != null  and workday != ''  ">workday,</if>
+            <if test="workdaytime != null  and workdaytime != ''  ">workdaytime,</if>
+            <if test="headmasterName != null  and headmasterName != ''  ">headmasterName,</if>
+            <if test="campusId != null  and campusId != ''  ">campusId,</if>
+            <if test="isdelete != null  ">isdelete,</if>
+            <if test="isvalid != null  ">isvalid,</if>
+            <if test="assistantname != null  and assistantname != ''  ">assistantname,</if>
+            <if test="lecturername != null  and lecturername != ''  ">lecturername,</if>
+            <if test="lossrateone != null  and lossrateone != ''  ">Lossrateone,</if>
+            <if test="lossratetwo != null  and lossratetwo != ''  ">Lossratetwo,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="clazzId != null  and clazzId != ''  ">#{clazzId},</if>
+            <if test="clazzname != null  and clazzname != ''  ">#{clazzname},</if>
+            <if test="studentcount != null  ">#{studentcount},</if>
+            <if test="subjectId != null  and subjectId != ''  ">#{subjectId},</if>
+            <if test="subjectname != null  and subjectname != ''  ">#{subjectname},</if>
+            <if test="begintime != null  and begintime != ''  ">#{begintime},</if>
+            <if test="endtime != null  and endtime != ''  ">#{endtime},</if>
+            <if test="workday != null  and workday != ''  ">#{workday},</if>
+            <if test="workdaytime != null  and workdaytime != ''  ">#{workdaytime},</if>
+            <if test="headmasterName != null  and headmasterName != ''  ">#{headmasterName},</if>
+            <if test="campusId != null  and campusId != ''  ">#{campusId},</if>
+            <if test="isdelete != null  ">#{isdelete},</if>
+            <if test="isvalid != null  ">#{isvalid},</if>
+            <if test="assistantname != null  and assistantname != ''  ">#{assistantname},</if>
+            <if test="lecturername != null  and lecturername != ''  ">#{lecturername},</if>
+            <if test="lossrateone != null  and lossrateone != ''  ">#{lossrateone},</if>
+            <if test="lossratetwo != null  and lossratetwo != ''  ">#{lossratetwo},</if>
+        </trim>
+    </insert>
+
+    <update id="updateBaseClazz" parameterType="BaseClazz">
+        update tb_base_clazz
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="clazzname != null  and clazzname != ''  ">clazzname = #{clazzname},</if>
+            <if test="studentcount != null  ">studentcount = #{studentcount},</if>
+            <if test="subjectId != null  and subjectId != ''  ">subject_id = #{subjectId},</if>
+            <if test="subjectname != null  and subjectname != ''  ">subjectname = #{subjectname},</if>
+            <if test="begintime != null  and begintime != ''  ">begintime = #{begintime},</if>
+            <if test="endtime != null  and endtime != ''  ">endtime = #{endtime},</if>
+            <if test="workday != null  and workday != ''  ">workday = #{workday},</if>
+            <if test="workdaytime != null  and workdaytime != ''  ">workdaytime = #{workdaytime},</if>
+            <if test="headmasterName != null  and headmasterName != ''  ">headmasterName = #{headmasterName},</if>
+            <if test="campusId != null  and campusId != ''  ">campusId = #{campusId},</if>
+            <if test="isdelete != null  ">isdelete = #{isdelete},</if>
+            <if test="isvalid != null  ">isvalid = #{isvalid},</if>
+            <if test="assistantname != null  and assistantname != ''  ">assistantname = #{assistantname},</if>
+            <if test="lecturername != null  and lecturername != ''  ">lecturername = #{lecturername},</if>
+            <if test="lossrateone != null  and lossrateone != ''  ">Lossrateone = #{lossrateone},</if>
+            <if test="lossratetwo != null  and lossratetwo != ''  ">Lossratetwo = #{lossratetwo},</if>
+        </trim>
+        where clazz_id = #{clazzId}
+    </update>
+
+    <delete id="deleteBaseClazzById" parameterType="String">
+        delete from tb_base_clazz where clazz_id = #{clazzId}
+    </delete>
+
+    <delete id="deleteBaseClazzByIds" parameterType="String">
+        delete from tb_base_clazz where clazz_id in
+        <foreach item="clazzId" collection="array" open="(" separator="," close=")">
+            #{clazzId}
+        </foreach>
+    </delete>
+
+
+    <select id="selectClazzByclazzName" resultType="ServiceProcessVO" parameterType="ServiceProcessVO">
+        SELECT
+            bc.clazz_id clazzid,
+            bc.clazzname
+        FROM
+            tb_base_clazz bc
+        WHERE
+            bc.subject_id = #{subjectid}
+        ORDER BY
+            bc.clazzname DESC
+    </select>
+
+    <select id="selectClazzByServerId" resultType="ServiceProcessVO" parameterType="String">
+        SELECT
+            bc.clazz_id clazzid,
+            bc.subject_id subjectid,
+            bc.subjectname,
+            bc.clazzname,
+            bc.headmasterName,
+            su.user_name empname,
+            bc.Estimate
+        FROM
+            tb_base_clazz bc
+            LEFT JOIN tb_base_stu_clazz bsc ON bc.clazz_id = bsc.clazz_id
+            LEFT JOIN tb_base_studentinfo bs ON bsc.stu_id = bs.stu_id
+            LEFT JOIN sys_user su ON bc.empname = su.user_id
+        WHERE
+            bc.clazz_id = #{clazzid} GROUP BY clazzid
+    </select>
+
+    <update id="updateBaseClazzServer" parameterType="ServiceProcessVO">
+        update tb_base_clazz
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="empname != null  and empname != ''  ">empname = #{empname},</if>
+            <if test="Estimate != null  and Estimate != ''  ">Estimate = #{Estimate},</if>
+            <if test="isprocess != null  and isprocess != ''  ">isprocess = #{isprocess},</if>
+        </trim>
+        where clazz_id = #{clazzid}
+    </update>
+</mapper>

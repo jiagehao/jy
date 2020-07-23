@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>jy</artifactId>
+        <groupId>com.jy</groupId>
+        <version>3.3</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    
+    <artifactId>jy-system</artifactId>
+    
+    <description>
+	    system系统模块
+	</description>
+	
+    <dependencies>
+    
+    	 <!-- Mysql驱动包 -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.json-lib</groupId>
+            <artifactId>json-lib</artifactId>
+            <version>2.4</version>
+            <classifier>jdk15</classifier>
+        </dependency>
+        <!-- 通用工具-->
+        <dependency>
+            <groupId>com.jy</groupId>
+            <artifactId>jy-common</artifactId>
+        </dependency>
+        
+    </dependencies>
+	
+</project>

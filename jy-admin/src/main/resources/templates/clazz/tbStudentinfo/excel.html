@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('导入班级信息')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+		<form id="importForm" enctype="multipart/form-data" class="mt20 mb10" style="display: none;">
+			<div class="col-xs-offset-1">
+				<input type="file" id="file" name="file"/>
+				<div class="mt10 pt5">
+					<input type="checkbox" id="updateSupport" name="updateSupport" title="如果登录账户已经存在，更新这条数据。"> 是否更新已经存在的用户数据
+					&nbsp;    <a onclick="$.table.importTemplate()" class="btn btn-default btn-xs"><i class="fa fa-file-excel-o"></i> 下载模板</a>
+				</div>
+				<font color="red" class="pull-left mt10">
+					提示：仅允许导入“xls”或“xlsx”格式文件！
+				</font>
+			</div>
+		</form>
+	</div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "clazz/tbStudentinfo"
+		$("#form-tbStudentinfo-add").validate({
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			},
+			focusCleanup: true
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/add", $('#form-tbStudentinfo-add').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('班级列表')" />
+	<meta charset="utf-8">
+</head>
+<body class="gray-bg" th:object="${sysUser}">
+<input id="subjectIds"  type="hidden"  th:field="*{subjectId}" />
+<input id="userName"  type="hidden"  th:field="*{userName}" />
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="formId">
+					<div class="select-list">
+						<ul>
+							<li>
+								学科名称：
+								<select name="subjectname" id="subject"></select>
+							</li>
+
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+	        <div class="btn-group-sm" id="toolbar" role="group">
+				<!--<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="clazz:tbClazz:add">-->
+					<!--<i class="fa fa-plus"></i> 添加-->
+				<!--</a>-->
+				<a class="btn btn-info" onclick="$.table.importExcel('','',1)" shiro:hasPermission="clazz:tbClazz:importExcel">
+					<i class="fa fa-upload"></i> 添加班级
+				</a>
+				<!--<a class="btn btn-info" id="test">-->
+
+				<!--</a>-->
+				<!--<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="clazz:tbClazz:edit">-->
+					<!--<i class="fa fa-edit"></i> 修改-->
+				<!--</a>-->
+				<!--<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="clazz:tbClazz:remove">-->
+					<!--<i class="fa fa-remove"></i> 删除-->
+				<!--</a>-->
+				<!--<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="clazz:tbClazz:export">-->
+						<!--<i class="fa fa-download"></i> 导出-->
+				 <!--</a>-->
+			</div>
+			<div class="col-sm-12 select-table table-striped">
+				<table class="table table-bordered" id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+	 <form id="importForm" enctype="multipart/form-data" class="form-horizontal fromtest m " style="display: none;">
+		 <div class="col-xs-offset-1">
+			 <div class="form-group">
+				 <label class="col-sm-3 control-label">班级名称：</label>
+				 <div class="col-sm-8">
+					 <input id="clazzName" name="clazzName"  class="form-control" type="text">
+				 </div>
+			 </div>
+			 <div class="form-group">
+				 <label class="col-sm-3 control-label">学科名称：</label>
+				 <div class="col-sm-8">
+				 <select name="subjectname" id="subjectID" class=" form-control ">
+
+				 </select>
+				 </div>
+			 </div>
+			 <div class="form-group">
+				 <label class="col-sm-3 control-label">开班时间：</label>
+				 <div class="col-sm-8">
+					 <input id="begintime" name="begintime" readonly="readonly" class="form-control time-input" placeholder="开班时间" type="text">
+				 </div>
+			 </div>
+			 <div class="form-group">
+				 <label class="col-sm-3 control-label">结课时间：</label>
+				 <div class="col-sm-8">
+					 <input id="endtime" name="endtime" readonly="readonly" class="form-control time-input" placeholder="结课时间" type="text">
+				 </div>
+			 </div>
+			 <div class="form-group">
+				 <label class="col-sm-3 control-label">班主任名称：</label>
+				 <div class="col-sm-8">
+					 <input id="headmasterName" name="headmasterName"  class="form-control" type="text">
+				 </div>
+			 </div>
+			 <input type="file" id="file" name="file"/>
+			 <font color="red" class="pull-left mt10">
+				 提示：仅允许导入“xls”或“xlsx”格式文件！
+			 </font>
+		 </div>
+	 </form>
+    <div th:include="include :: footer"></div>
+    <script th:inline="javascript">
+        var gets;
+        $(document).ready(function(){
+            gets = get();
+        });
+		$(function(){
+            new OptionUtils("subjectID","/clazz/tbSubject/TbSubjectList","subjectId","subjectName");
+            new OptionUtils("subject","/clazz/tbSubject/TbSubjectList","subjectId","subjectName");
+
+//            layui.use('laydate', function() {
+//                var laydate = layui.laydate;
+//                laydate.render({
+//                    elem: '#test'
+//                    ,position: 'static'
+//                    ,showBottom: false
+////				,range:true
+//                    ,mark: {
+//                        '2019-06-14': '生日'
+////                    ,'0-12-31': '跨年' //每年12月31日
+//
+//                    }
+//                    ,change: function(value, date){ //监听日期被切换
+//                        console.log(value)
+//                        console.log(date)
+//                    }
+//                });
+//				console.log(1)
+//            })
+        })
+        var editFlag = [[${@permission.hasPermi('clazz:tbClazz:edit')}]];
+        var view = [[${@permission.hasPermi('clazz:tbStudentinfo:view')}]];
+        var removeFlag = [[${@permission.hasPermi('clazz:tbClazz:remove')}]];
+        $(function(){
+        var prefix = ctx + "clazz/tbClazz";
+            $("#subject").change(function(){$.table.search()});
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+				exportUrl: prefix + "/export",
+                importUrl: prefix + "/importExcel",
+                modalName: "班级",
+		        showExport: false,
+                search:false,
+                showSearch:false,//搜索关闭
+                showToggle:false,//切换视图关闭
+                rowStyle:rowStyle,
+                onLoadSuccess:onLoadSuccess,
+                pageSize:150,
+                columns: [{
+                    title: "序号",
+                    formatter: function (value, row, index) {
+                        return $.table.serialNumber(index);
+
+                    },
+                    width:5,
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center'
+		        },
+				{
+					field : 'subjectname',
+					title : '学科',
+					visible: true,
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center',
+				},
+				{
+					field : 'clazzname',
+					title : '班级',
+					sortable: true,
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center'
+				},
+				{
+					field : 'workday',
+					title : '工作日',
+					sortable: true,
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center',
+                    formatter: function(value, row, index) {
+					    if(value<=110){
+                            return value;
+						}else{
+					        return "110"
+						}
+
+                    }
+				},
+				{
+					field : 'rateEmployment',
+					title : '就业率',
+					sortable: true,
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center',
+                    formatter: function(value, row, index) {
+                        return value+"%"
+                    }
+				},
+				{
+					field : 'salary',
+					title : '就业薪资',
+					sortable: true,
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center',
+
+				},
+				{
+					field : 'begintime',
+					title : '开班时间',
+					sortable: true,
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center'
+				},
+				{
+					field : 'endtime',
+					title : '毕业时间',
+					sortable: true,
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center'
+				},
+				{
+					field : 'classSize',
+					title : '班级人数',
+					sortable: true,
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center'
+				},
+				{
+					field : 'employment',
+					title : '未就业人数',
+					sortable: true,
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center'
+				},
+		        {
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	var actions = [];
+		            	var url = '/clazz/tbStudentinfo';
+		            	actions.push('<a class="btn btn-success btn-xs ' + view + '" href="javascript:;" onclick="createMenuItem(\''+url+'?clazzId='+row.clazzId + '&subjectName='+row.subjectname+'&nbsp;&nbsp;'+row.clazzname+'&nbsp;&nbsp;期\',\'' + row.subjectname+'&nbsp;&nbsp;'+row.clazzname+'&nbsp;&nbsp;期\')"><i class="fa fa-edit"></i>进入</a> ');
+		            	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:;" onclick="$.operate.edit(\'' + row.clazzId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:;" onclick="$.operate.remove(\'' + row.clazzId + '\')"><i class="fa fa-remove"></i>删除</a>');
+						return actions.join('');
+		            },
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center'
+		        }]
+            };
+            $.table.init(options)
+        })
+        function onLoadSuccess(row,index){
+            var s;
+            var msg = "<font color='red'>" + $("#userName").val() + "老师，您有重要的消息！</font>";
+            var num = 0;
+            var datas =0;
+			for(var o=0;o<gets.length;o++){
+                if($("#subjectIds").val()==gets[o].subjectId){
+                    datas = o
+					break;
+				}
+			}
+			for(var i = 0;i<row.rows.length;i++){
+                if($("#subjectIds").val()!=''){
+                    s = parseInt(row.rows[i].rateEmployment);
+                    if($("#subjectIds").val()==row.rows[i].subjectId){
+						if(parseInt(row.rows[i].workday)<=66){
+                            if(parseInt(row.rows[i].workday)>22&&parseInt(row.rows[i].workday)<=44){
+                                if(s<parseInt(gets[datas].one)){
+                                    msg += "<br/>" + row.rows[i].subjectname+"-<font color='red'>第"+row.rows[i].clazzname+"期</font>,目前工作日为：<font color='red'>"+row.rows[i].workday+"天</font>"
+                                    num++
+                                }
+                            }else if(parseInt(row.rows[i].workday)>44&&parseInt(row.rows[i].workday)<=66){
+                                if(s<parseInt(gets[datas].tow)){
+                                    msg += "<br/>" + row.rows[i].subjectname+"-<font color='red'>第"+row.rows[i].clazzname+"期</font>,目前工作日为：<font color='red'>"+row.rows[i].workday+"天</font>"
+                                    num++
+                                }
+                            }
+						}
+                    }
+                }
+			}
+			if(msg.length>40){
+                msg += "<br/>共计：<font color='red'>"+num+"个</font>班级需要您尽快处理"
+                return $.modal.alertWarning(msg)
+			}
+		}
+        var front_color = "";
+        function rowStyle(row, index) {
+            style={css:{'color':color(row,gets)}};
+            return style;
+        }
+        function get(){
+            $.ajax({
+                url:"/clazz/tbSubject/TbSubjectList",
+                type:"get",
+                dataType:"json",
+//                async:false,
+                success:function(data){
+                   gets = data;
+                }
+            })
+
+        }
+        function color(row,data){
+
+            front_color = ""
+            var s = parseInt(row.rateEmployment);
+            /*for(var i=0;i<data.length;i++){
+
+                if(row.subjectId == data[i]["subjectId"]){
+                    if(parseInt(row.workday)>22&&parseInt(row.workday)<=44&&parseInt(row.rateEmployment)>0){
+                    	alert(parseInt(row.rateEmployment));
+                        if(s<data[i].one){
+                            return front_color = '#FF0000';
+                        }
+                    }else if(parseInt(row.workday)>44&&parseInt(row.workday)<=66&&parseInt(row.rateEmployment)>0){
+                        if(s<data[i].tow){
+                            return front_color = '#FF0000';
+                        }
+                    }else if(parseInt(row.workday)>66&&parseInt(row.rateEmployment)>0){
+                        if(s<data[i].three){
+                            return front_color = '#FF0000';
+                        }
+                    }else{
+                        return front_color
+					}
+                }
+            }*/
+		}
+
+//
+//		setTimeout(function () {
+//            $("#test .layui-laydate-content table tbody td").each(function(index, item){
+//                var laydates = layui.laydate;
+//                debugger
+//                console.log(index)
+//                console.log(item)
+//                console.log()
+//                var lay = window.lay(item)
+//				if(index==0){
+//                    lay.addClass("layui-this")
+//				}
+//            })
+//        },500)
+
+
+	</script>
+</body>
+</html>

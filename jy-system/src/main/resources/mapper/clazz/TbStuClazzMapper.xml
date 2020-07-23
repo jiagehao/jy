@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jy.system.mapper.TbStuClazzMapper">
+    
+    <resultMap type="TbStuClazz" id="TbStuClazzResult">
+        <result property="stuclazzId"    column="stuclazz_id"    />
+        <result property="stuId"    column="stu_id"    />
+        <result property="clazzId"    column="clazz_id"    />
+    </resultMap>
+	
+	<sql id="selectTbStuClazzVo">
+        select stuclazz_id, stu_id, clazz_id from tb_stu_clazz
+    </sql>
+	
+    <select id="selectTbStuClazzList" parameterType="TbStuClazz" resultMap="TbStuClazzResult">
+        <include refid="selectTbStuClazzVo"/>
+        <where>  
+            <if test="stuclazzId != null  and stuclazzId != '' "> and stuclazz_id = #{stuclazzId}</if>
+             <if test="stuId != null  and stuId != '' "> and stu_id = #{stuId}</if>
+             <if test="clazzId != null  and clazzId != '' "> and clazz_id = #{clazzId}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbStuClazzById" parameterType="String" resultMap="TbStuClazzResult">
+        <include refid="selectTbStuClazzVo"/>
+        where stuclazz_id = #{stuclazzId}
+    </select>
+        
+    <insert id="insertTbStuClazz" parameterType="TbStuClazz">
+        insert into tb_stu_clazz
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="stuclazzId != null  and stuclazzId != ''  ">stuclazz_id,</if>
+			<if test="stuId != null  and stuId != ''  ">stu_id,</if>
+			<if test="clazzId != null  and clazzId != ''  ">clazz_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="stuclazzId != null  and stuclazzId != ''  ">#{stuclazzId},</if>
+			<if test="stuId != null  and stuId != ''  ">#{stuId},</if>
+			<if test="clazzId != null  and clazzId != ''  ">#{clazzId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbStuClazz" parameterType="TbStuClazz">
+        update tb_stu_clazz
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="stuId != null  and stuId != ''  ">stu_id = #{stuId},</if>
+            <if test="clazzId != null  and clazzId != ''  ">clazz_id = #{clazzId},</if>
+        </trim>
+        where stuclazz_id = #{stuclazzId}
+    </update>
+
+	<delete id="deleteTbStuClazzById" parameterType="String">
+        delete from tb_stu_clazz where stu_id = #{stuclazzId}
+    </delete>
+	
+    <delete id="deleteTbStuClazzByIds" parameterType="String">
+        delete from tb_stu_clazz where stu_id in
+        <foreach item="stuclazzId" collection="array" open="(" separator="," close=")">
+            #{stuclazzId}
+        </foreach>
+    </delete>
+    
+</mapper>

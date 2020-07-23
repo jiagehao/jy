@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.w3.org/1999/xhtml">
+<!--<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">-->
+<!--<link rel="stylesheet" type="text/css" th:href="@{/index.css}">-->
+<head>
+    <th:block th:include="include :: header('学员列表')"/>
+    <link th:href="@{'/ajax/libs/layui/css/layui.css'}" href="../static/ajax/libs/layui/css/layui.css" media="all"
+          rel="stylesheet"/>
+    <script src="/ajax/libs/layui/layui.js" th:src="@{/ajax/libs/layui/layui.js}"></script>
+    <script src="/ajax/libs/module/tableMerge.js" th:src="@{/ajax/libs/module/tableMerge.js}"></script>
+    <script src="../static/ajax/libs/layer/DataTableExtend.js" th:src="@{/ajax/libs/layer/DataTableExtend.js}"></script>
+    <style>.layui-table-cell{padding: 0 0;text-align: center;}
+    #mergeTable .layui-table-cell{
+        height:auto;
+        overflow:visible;
+        text-overflow:inherit;
+        white-space:normal;
+        /*height: 80px;*/
+    }
+        .layui-btn{white-space: normal;}
+    .layui-table-cell{white-space: normal;}
+    .laytable-cell-1-0-21{height: 80px;}
+    .laytable-cell-1-0-22{height: 80px;}
+    .laytable-cell-1-0-23{height: 80px;}
+    .laytable-cell-1-0-24{height: 80px;}
+    .laytable-cell-1-0-25{height: 80px;}
+    .laytable-cell-10001-0-21{height: 80px;}
+    .laytable-cell-10001-0-22{height: 80px;}
+    .laytable-cell-10001-0-23{height: 80px;}
+    .laytable-cell-10001-0-24{height: 80px;}
+    .laytable-cell-10001-0-25{height: 80px;}
+    </style>
+</head>
+<body class="gray-bg">
+
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            学员名字：<input type="text" name="name"/>
+                        </li>
+
+                        <li>
+                            电话号码：<input type="text" name="phonenumber"/>
+                        </li>
+
+                        <li>
+                            公司名称：<input type="text" name="companyname"/>
+                        </li>
+
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+
+
+
+        <div class="btn-group-sm" id="toolbar" role="group" >
+
+            <div class="col-sm-12 search-collapse">
+                <a class="btn btn-success" onclick="addBaseStudent()" shiro:hasPermission="clazz:tbBaseStudentinfo:add">
+                    <i class="fa fa-plus"></i> 添加学员
+                </a>
+            </div>
+            <!--<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="clazz:tbBaseStudentinfo:remove">-->
+            <!--<i class="fa fa-remove"></i> 删除-->
+            <!--</a>-->
+            <!--<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="clazz:tbBaseStudentinfo:export">-->
+            <!--<i class="fa fa-download"></i> 导出-->
+            <!--</a>-->
+        </div>
+
+        <div class="col-sm-12 select-table table-striped jtable layui-tab-item layui-show">
+            <!--<table class="table table-bordered" id="bootstrap-table" data-mobile-responsive="true"></table>-->
+            <table id="mergeTable" lay-filter="table"></table>
+            <script type="text/html" id="barDemo">
+                <a class="layui-btn layui-btn-xs layui-btn-radius " lay-event="isEm"
+                   shiro:hasPermission="clazz:tbBaseStudentinfo:isEm">留级</a>
+                <a class="layui-btn layui-btn-xs layui-btn-radius layui-btn-primary" lay-event="isOut"
+                   shiro:hasPermission="clazz:tbBaseStudentinfo:isOut">流失</a>
+                <a class="layui-btn layui-btn-xs layui-btn-radius " lay-event="isProblem"
+                   shiro:hasPermission="clazz:tbBaseStudentinfo:isProblem">访谈</a>
+                <a class="layui-btn layui-btn-xs layui-btn-radius layui-btn-danger" lay-event="addInfo"
+                   shiro:hasPermission="clazz:tbBaseStudentinfo:addTrack">添加记录</a>
+                <a class="layui-btn layui-btn-xs layui-btn-radius layui-btn-danger" lay-event="checkInfo"
+                   shiro:hasPermission="clazz:tbBaseStudentinfo:trackList">记录信息</a>
+                <a class="layui-btn layui-btn-xs layui-btn-radius layui-btn-danger" lay-event="isSf"
+                   shiro:hasPermission="clazz:tbBaseStudentinfo:isSf">重点关注</a>
+                <a class="layui-btn layui-btn-xs layui-btn-radius layui-btn-warm" lay-event="edit"
+                   shiro:hasPermission="clazz:tbBaseStudentinfo:edit">编辑</a>
+                <a class="layui-btn layui-btn-xs layui-btn-radius layui-btn-warm" lay-event="del"
+                   shiro:hasPermission="clazz:tbBaseStudentinfo:remove">删除</a>
+            </script>
+        </div>
+
+
+    </div>
+</div>
+
+
+</form>
+<form id="importForm" enctype="multipart/form-data" class="mt20 mb10" style="display: none;">
+    <div class="col-xs-offset-1">
+        <input type="file" id="file" name="file"/>
+        <!--<div class="mt10 pt5">-->
+        <!--<input type="checkbox" id="updateSupport" name="updateSupport" title="如果登录账户已经存在，更新这条数据。"> 是否更新已经存在的用户数据-->
+        <!--&nbsp;    <a onclick="$.table.importTemplate()" class="btn btn-default btn-xs"><i class="fa fa-file-excel-o"></i> 下载模板</a>-->
+        <!--</div>-->
+        <font color="red" class="pull-left mt10">
+            提示：仅允许导入“xls”或“xlsx”格式文件！
+        </font>
+    </div>
+</form>
+
+
+
+
+<div th:include="include :: footer"></div>
+
+<script th:inline="javascript">
+    // var removeFlag = [[${@permission.hasPermi('clazz:tbBaseStudentinfo:remove')}]];
+</script>
+<script th:inline="javascript"> var ctx = [[@{/}]]; </script>
+<script type="text/javascript" th:inline="none">
+        //获取地址栏中的值
+        function getUrlParam(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+            var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+            if (r != null) return unescape(r[2]);
+            return null; //返回参数值
+        }
+
+        var clazzid = getUrlParam('clazzId');
+        var subjectId = getUrlParam('subjectId');
+
+        $('#formId').append('<input type="hidden" value="'+subjectId+'" name="subjectId">')
+        $('#formId').append('<input type="hidden" value="'+clazzid+'" name="clazzId">')
+
+        $.ajax({
+            url:"/clazz/tbBaseStudentinfo/day",
+            type:"get",
+//        dataType:"json",
+            data:{"subjectId":subjectId},
+            success:function(data){
+                var nums = 25
+                var num = 0
+                if(data[0].subjectday==11){//16-17-18-19
+                    num = 3
+                    nums = 23
+                }else if(data[0].subjectday==12){
+                    num = 2
+                    nums = 24
+                }else if(data[0].subjectday==13){
+                    num = 1
+                    nums = 25
+                }else if(data[0].subjectday==10){
+                    num = 4
+                    nums = 22
+                }
+
+                var arr = [
+                    {type: 'radio',field:"stuid", title: '序号', merge: true}
+                    , {field: 'name', title: '姓名', merge: true, width: $(document).width()*0.8/nums}
+                    , {field: 'sex', title: '性别', merge: ['name', 'sex'],width: $(document).width()*0.8/nums}
+                    , {field: 'age', title: '年龄', merge: ['name', 'age'],width: $(document).width()*0.8/nums}
+                    , {field: 'education', title: '学历', merge: ['name', 'education'], width: $(document).width()*0.8/nums}
+                    , {field: 'category', title: '类别', merge: ['name', 'category'], width: $(document).width()*0.8/nums}
+                    , {field: 'one', edit: 'text', title: '一', width: $(document).width()*0.8/nums}
+                    , {field: 'two', edit: 'text', title: '二', width: $(document).width()*0.8/nums}
+                    , {field: 'three', edit: 'text', title: '三', width: $(document).width()*0.8/nums}
+                    , {field: 'four', edit: 'text', title: '四', width: $(document).width()*0.8/nums}
+                    , {field: 'five', edit: 'text', title: '五', width: $(document).width()*0.8/nums}
+                    , {field: 'six', edit: 'text', title: '六', width: $(document).width()*0.8/nums}
+                    , {field: 'seven', edit: 'text', title: '七', width: $(document).width()*0.8/nums}
+                    , {field: 'eight', edit: 'text', title: '八', width: $(document).width()*0.8/nums}
+                    , {field: 'nine', edit: 'text', title: '九', width: $(document).width()*0.8/nums}
+                    , {field: 'ten', edit: 'text', title: '十', width: $(document).width()*0.8/nums}
+                    , {field: 'eleven', edit: 'text', title: '十一', width: $(document).width()*0.8/nums}
+                    , {field: 'eleven', edit: 'text', title: '十二', width: $(document).width()*0.8/nums}
+                    , {field: 'eleven', edit: 'text', title: '十三', width: $(document).width()*0.8/nums}
+                    , {field: 'eleven', edit: 'text', title: '十四', width: $(document).width()*0.8/nums}
+                    , {field: 'avg', title: '平均分', width: $(document).width()*0.8/nums,templet: function(row){
+                        var category=row.category
+                        var avgScore=categoryAvg(category,row);
+                        return avgScore
+                    }}
+                    , {field: 'workexperience', edit: 'text', title: '升级成绩', edit: 'text',merge: ['name', 'workexperience'], width: $(document).width()*0.8/nums}
+                    , {field: 'total', title: '最终成绩', merge: ['name', 'total'], width: $(document).width()*0.8/nums}
+                    , {field: 'remarkshr', title: '流失或者留级', merge: ['name', 'remarkshr'], width: $(document).width()*1/nums}
+                    , {field: 'description', title: '信息记录', merge: ['name', 'description'], width: $(document).width()*1/nums}
+                    , {title: '操作',field: 'caozuo', align: 'center', toolbar: '#barDemo', merge: ['name']}
+                    , {field: 'outOfContact', title: '是否流失', hide: true}
+                    , {field: 'stuid', title: '流失', hide: true}
+                    , {field: 'stressfollow', title: '是否重点关注', hide: true}
+                    , {field: 'id', title: 'id', hide:true}
+                    // ,{ title:'操作',align:'center',  toolbar: '#barDemo',merge:['name'], width:450, fixed: 'right'}
+                ]
+                for(var i=0;i<num;i++){
+                    var a = 20 - num
+                    arr.splice(a,1);
+                }
+                //课程数
+                var totalDay=11;
+
+                var prefix = ctx + "clazz/tbBaseStudentinfo";
+
+                var laytable;
+
+
+                layui.use(['table', 'layer', 'element', 'tableMerge'], function () {
+                    var table = layui.table,
+                        tableMerge = layui.tableMerge;
+                    var $ = layui.$
+                        ,layer = layui.layer
+                        ,form = layui.form
+                    //监听单元格编辑
+                    table.on('edit(table)', function (obj) {
+                        var value = obj.value //得到修改后的值
+                            , data = obj.data //得到所在行所有键值
+                            , field = obj.field; //得到字段
+                        //最终成绩需要分别保存日常表现+代码量的workexperience字段
+
+                        var g=/[1-9]\d*/;
+                        if(!g.test(value)||parseInt(value)>110) {
+                            layer.msg('请重新输入0-110范围内的有效正整数');
+                            return false;
+                        }
+
+                        if (field=='workexperience'){
+                            saveFinalScore({
+                                "workexperience":value,
+                                "stuId":data.stuid,
+                            })
+                            return
+                        }
+                        $.operate.saveLayer(prefix + "/editAc", data);
+                        //修改
+                        //refresh(table);
+                    });
+
+                    //监听工具条 删除
+                    table.on('tool(table)', function (obj) {
+
+                        var data = obj.data;
+                        console.log(obj)
+
+                        var event = obj.event;
+
+                        if (obj.event === 'detail') {
+                            layer.msg('ID：' + data.id + ' 的查看操作');
+                        }
+
+                        //留级
+                        if (obj.event === 'isEm') {
+                            var str = '<div class="layui-form layui-form-pane wrapper wrapper-content animated fadeInRight ibox-content">'+
+                                '<form class="form-horizontal m layui-form" id="form-isEm">'+
+                                '<div class="form-group">'+
+                                '<label class="col-sm-3 control-label">留级学员：</label>'+
+                                '<div class="col-sm-8">'+
+                                '<input  class="form-control" readonly="readonly" value="'+data.name+'" type="text">'+
+                                '</div>'+
+                                '</div>'+
+                                '<div class="form-group">'+
+                                '<label class="col-sm-3 control-label">留级记录：</label>'+
+                                '<div class="col-sm-8">'+
+                                '<input id="remarkshr" name="remarkshr" lay-verify="required"  autocomplete="off" class="form-control" type="text">'+
+                                '<input id="stuId" name="stuId" type="hidden"  value="'+data.stuid+'"/>'+
+                                '<input id="employment" name="employment" type="hidden"  value="0"/>'+
+                                '</div>'+
+                                '</div>'+
+                                '</form>'+
+                                // '<div style="padding: px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;">'+
+                                //     '留级学生无法取消留级'
+                                // '</div>'+
+                                '</div>';
+                            layer.open({
+                                id: 'layerDemo'+data.stuid //防止重复弹出
+                                ,title:data.name+"留级记录"
+                                ,area:['500px','300px']
+                                ,content:str
+                                ,closeBtn: false
+                                ,btn:['确定','取消']
+                                ,yes:function(){
+                                    $.operate.saveLayer(prefix + "/isEm",$('#form-isEm').serialize());
+                                    //刷新
+                                    refresh(table);
+                                }
+                            });
+                        }
+
+                        //流失
+                        if (obj.event === 'isOut') {
+                            var msg = data.outOfContact != '0' ?  '取消流失对象吗' : '设置流失对象吗'
+                            var outOfContact = data.outOfContact != '0' ? '0' : '1'
+                            layer.confirm('需要为学生'+'&nbsp;'+data.name+'&nbsp;'+msg, function (index) {
+                                $.operate.saveLayer(prefix + "/isSf", {"stuId": data.stuid,"outOfContact":outOfContact});
+                                layer.close(index);
+                                //刷新
+                                // refresh(table);
+                            });
+                        }
+
+                        //访谈
+                        if (obj.event === 'isProblem') {
+                            layer.confirm('需要为学生'+'&nbsp;'+data.name+'&nbsp;'+'为访谈对象吗', function (index) {
+                                $.operate.saveLayer(prefix + "/isProblem", {"stuid": data.stuid,"clazzid":clazzid});
+                                layer.close(index);
+                                //刷新
+                                // refresh(table);
+                            });
+                        }
+
+                        /**添加与查询均用TbStudentinfoController操作**/
+                        //添加记录
+                        if (obj.event === 'addInfo') {
+                            $.operate.addStudentInfo(data.stuid);
+                        }
+
+                        //查询记录
+                        if (obj.event === 'checkInfo') {
+                            $.operate.openStudentInfo(data.stuid);
+                        }
+
+                        //重点关注
+                        if (obj.event === 'isSf') {
+                            var msg = data.stressfollow != '0' ?  '取消重点关注对象吗' : '设置重点关注对象吗'
+                            var stressfollow = data.stressfollow != '0' ? '0' : '1'
+                            layer.confirm('需要为学生'+'&nbsp;'+data.name+'&nbsp;'+msg, function (index) {
+                                $.operate.saveLayer(prefix + "/isSf", {"stuId": data.stuid,"stressfollow":stressfollow});
+                                layer.close(index);
+                                //刷新
+                                // refresh(table);
+                            });
+                        }
+
+                        //删除
+                        if (obj.event === 'del') {
+                            layer.confirm('需要删除'+'&nbsp;'+data.name+'&nbsp;'+'学生吗', function (index) {
+                                $.operate.saveLayer(prefix + "/remove", {"stuId": data.stuid});
+                                //删除学生
+                                layer.close(index);
+                                //刷新
+                                // refresh(table);
+                            });
+                        }
+
+                        //删除
+                        if (obj.event === 'edit') {
+
+                            $.operate.edit(data.stuid)
+                        }
+
+                    });
+                    /**
+                     * 自动合并表格
+                     */
+//        var clazz = getUrlParam('clazzId')
+                        //更新表格
+                    var index = layer.load(1);
+                    var documentyWidth = $(document).width()
+                    laytable= table.render({
+
+                        elem: '#mergeTable'
+                        // ,id: 'testReload' //区别于table标签的id
+//          , height: 550
+//           ,width:documentyWidth*0.8
+                        , url: prefix + "/list"
+                        // , toolbar: true
+                        , type: "get"
+                        , where: {"clazzid": clazzid,"subjectId":subjectId}
+                        , limit: 30
+                        , page: true
+                        , cols:
+                            [arr]
+
+                        , done: function (res, curr, count) {
+                            layer.close(index);    //返回数据关闭loading
+                            var avg=curr.avg
+                            tableMerge.render(this)
+                            //隐藏列学科判断
+                            // $(".layui-table-box").find("[data-field='five']").css("display","none");
+
+                            //代码量 总分/天数*0.6
+
+
+                            //日常表现 总分/天数*0.4
+
+
+                            // 表格渲染完成之后的回调
+                            $(".layui-table th").css("font-weight", "bold");// 设定表格标题字体加粗
+
+//                            LayUIDataTable.SetJqueryObj($);// 第一步：设置jQuery对象
+//               var tables = $("#mergeTable").next().find(".layui-table-box");
+//               tables.find("[data-field='eleven']").css("display","none");
+//
+//                            console.log($("[data-field='caozuo']").children().eq(0)[0])
+//              $("[data-field='caozuo']").children().eq(0)[0].css('height', '80')
+                            //LayUIDataTable.HideField('num');// 隐藏列-单列模式
+                            //LayUIDataTable.HideField(['num','match_guest']);// 隐藏列-多列模式
+
+                            var currentRowDataList = LayUIDataTable.ParseDataTable(function (index, currentData, rowData) {
+
+                                var msg = '<div style="text-align: left"> 【当前页数据条数】' + currentRowDataList.length + '<br/>【当前行索引】' + index + '<br/>【触发的当前行单元格】' + currentData + '<br/>【当前行数据】' + JSON.stringify(rowData) + '</div>';
+                                // layer.msg(msg)
+                            })
+                            $.each(currentRowDataList, function (index, obj) {
+                                var curRow_a = currentRowDataList[index];
+                                var curRow_b = currentRowDataList[index + 1];
+                                if (index == currentRowDataList.length - 1) {
+                                    curRow_b = curRow_a
+                                }
+                                var st_a = curRow_a['stuid'].value == 'undefined' ? "0" : curRow_a['stuid'].value;
+                                var st_b = curRow_b['stuid'].value == 'undefined' ? "0" : curRow_b['stuid'].value;
+                                if (obj['outOfContact'].value == "1" && st_a == st_b) {
+                                    curRow_b['category'].row.css("background-color", "#F5FA22");
+                                    curRow_a['category'].row.css("background-color", "#F5FA22");
+                                    return
+                                }
+
+                                if (obj['stressfollow'].value == "1" && st_a == st_b) {
+                                    curRow_b['stressfollow'].row.css("background-color", "#fa4848");
+                                    curRow_a['stressfollow'].row.css("background-color", "#fa4848");
+                                    return
+                                }
+
+                            })
+                        }// end done
+                    });
+
+
+                })
+
+                //刷新表格
+                function refresh(table) {
+                    //更新表格
+                    var index = layer.load(1);
+                    table.reload('mergeTable', {
+                        url: '/clazz/tbBaseStudentinfo/list'
+                        ,where: {"clazzid": clazzid}//设定异步数据接口的额外参数
+                        //,height: 300
+                        ,loading: true
+                        ,done:function (res) {   //返回数据执行回调函数
+                            layer.close(index);    //返回数据关闭loading
+                        }
+                    });
+                }
+
+                //保存最终成绩
+                function saveFinalScore(data){
+
+                    var config = {
+                        url: prefix + "/saveFinalScore",
+                        type: "post",
+                        dataType: "json",
+                        data: data,
+                        beforeSend: function () {
+                            $.modal.loading("正在处理中，请稍后...");
+                        },
+                        success: function(result) {
+                            $.operate.ajaxSuccess(result);
+                        }
+                    };
+                    $.ajax(config)
+                }
+
+                function addBaseStudent(){
+                    // $.operate.add(clazzid);
+                    var url= prefix + "/add/{id}".replace("{id}", clazzid)
+                    // $.operate.openJoin(url,"添加学员信息")
+                    $.modal.open("添加" + $.table._option.modalName, url);
+                }
+
+
+                function categoryAvg(category,row){
+                    var total =0;
+                    total+=(row.one - 0);
+                    total+=(row.two - 0);
+                    total+=(row.three - 0);
+                    total+=(row.four - 0);
+                    total+=(row.five - 0);
+                    total+=(row.six - 0);
+                    total+=(row.seven - 0);
+                    total+=(row.eight - 0);
+                    total+=(row.nine - 0);
+                    total+=(row.ten - 0);
+                    total+=(row.eleven - 0);
+                    if (category=='代码量'){
+                        return parseInt(total/totalDay*0.6)
+                    }else{
+                        return parseInt(total/totalDay*0.4)
+                    }
+                }
+
+
+                $(function() {
+
+                    var options = {
+                        url: prefix + "/list",
+                        queryParams: function (data) {
+                            data.clazzId = getUrlParam('clazzId')
+                            return data;
+                        },
+                        createUrl: prefix + "/add",
+                        updateUrl: prefix + "/edit/{id}",
+                        removeUrl: prefix + "/remove",
+                        exportUrl: prefix + "/export",
+                        importUrl: prefix + "/importExcelGroup",
+                        importTemplateUrl: prefix + "/importTemplate",
+                        //详情学生详细记录
+                        infoUrl: prefix + "/info/{stuId}",
+                        //添加学生详细记录
+                        addInfoUrl: prefix + "/addInfo/{stuId}",
+                        modalName: "基础班学员",
+                    }
+                    $.table.init(options);
+
+                });
+
+            }
+        })
+
+
+
+</script>
+
+</body>
+</html>

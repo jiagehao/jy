@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jy.system.mapper.BaseStudentinfoMapper">
+
+    <resultMap type="BaseStudentinfo" id="BaseStudentinfoResult">
+        <result property="stuId" column="stu_id"/>
+        <result property="name" column="name"/>
+        <result property="sex" column="sex"/>
+        <result property="age" column="age"/>
+        <result property="phonenumber" column="phonenumber"/>
+        <result property="qQnumber" column="QQnumber"/>
+        <result property="graduateschool" column="graduateschool"/>
+        <result property="education" column="education"/>
+        <result property="isdelete" column="isdelete"/>
+        <result property="companyId" column="company_id"/>
+        <result property="companyname" column="companyname"/>
+        <result property="empId" column="emp_id"/>
+        <result property="empname" column="empname"/>
+        <result property="isvalid" column="isvalid"/>
+        <result property="entrytime" column="entrytime"/>
+        <result property="salary" column="Salary"/>
+        <result property="employment" column="Employment"/>
+        <result property="outOfContact" column="outOfContact"/>
+        <result property="remarkshr" column="remarkshr"/>
+        <result property="workexperience" column="workexperience"/>
+        <result property="campusId" column="campusId"/>
+        <result property="idnumber" column="idnumber"/>
+        <result property="stressfollow" column="stressfollow"/>
+        <result property="idnumberAddress" column="idnumberAddress"/>
+        <result property="major" column="major"/>
+    </resultMap>
+
+    <sql id="selectBaseStudentinfoVo">
+        select stu_id, name, sex, age, phonenumber, QQnumber, graduateschool, education, isdelete, company_id, companyname, emp_id, empname, isvalid, entrytime, Salary, Employment, outOfContact, remarkshr, workexperience, campusId, idnumber, stressfollow, idnumberAddress,violationOfDiscipline,category,major from tb_base_studentinfo
+    </sql>
+
+    <select id="selectBaseStudentinfoList" parameterType="BaseStudentinfo" resultMap="BaseStudentinfoResult">
+        <include refid="selectBaseStudentinfoVo"/>
+        <where>
+            <if test="stuId != null  and stuId != '' ">and stu_id = #{stuId}</if>
+            <if test="name != null  and name != '' ">and name = #{name}</if>
+            <if test="sex != null  and sex != '' ">and sex = #{sex}</if>
+            <if test="age != null ">and age = #{age}</if>
+            <if test="phonenumber != null  and phonenumber != '' ">and phonenumber = #{phonenumber}</if>
+            <if test="qQnumber != null  and qQnumber != '' ">and QQnumber = #{qQnumber}</if>
+            <if test="graduateschool != null  and graduateschool != '' ">and graduateschool = #{graduateschool}</if>
+            <if test="education != null  and education != '' ">and education = #{education}</if>
+            <if test="isdelete != null ">and isdelete = #{isdelete}</if>
+            <if test="companyId != null  and companyId != '' ">and company_id = #{companyId}</if>
+            <if test="companyname != null  and companyname != '' ">and companyname = #{companyname}</if>
+            <if test="empId != null  and empId != '' ">and emp_id = #{empId}</if>
+            <if test="empname != null  and empname != '' ">and empname = #{empname}</if>
+            <if test="isvalid != null ">and isvalid = #{isvalid}</if>
+            <if test="entrytime != null  and entrytime != '' ">and entrytime = #{entrytime}</if>
+            <if test="salary != null  and salary != '' ">and Salary = #{salary}</if>
+            <if test="employment != null ">and Employment = #{employment}</if>
+            <if test="outOfContact != null ">and outOfContact = #{outOfContact}</if>
+            <if test="remarkshr != null  and remarkshr != '' ">and remarkshr = #{remarkshr}</if>
+            <if test="workexperience != null  and workexperience != '' ">and workexperience = #{workexperience}</if>
+            <if test="campusId != null  and campusId != '' ">and campusId = #{campusId}</if>
+            <if test="idnumber != null  and idnumber != '' ">and idnumber = #{idnumber}</if>
+            <if test="stressfollow != null  and stressfollow != '' ">and stressfollow = #{stressfollow}</if>
+            <if test="idnumberAddress != null  and idnumberAddress != '' ">and idnumberAddress = #{idnumberAddress}</if>
+        </where>
+    </select>
+
+    <select id="selectBaseStudentinfoById" parameterType="String" resultMap="BaseStudentinfoResult">
+        <include refid="selectBaseStudentinfoVo"/>
+        where stu_id = #{stuId}
+    </select>
+
+    <!-- 查询学员的日常表现、代码量以及最终成绩 -->
+    <select id="selectBaseStudentinfoByClazzId" parameterType="BaseStudentInfoVO" resultType="BaseStudentInfoVO">
+        select s.stu_id stuid,cast(getsum(s.stu_id,#{num}) AS SIGNED INTEGER ) total,s.category,bs.name,bs.sex,bs.age,bs.education,
+        app.createtime,
+        app.description,
+        s.one,s.two,s.three,s.four,s.five,s.six,s.seven,s.eight,s.nine,s.ten,s.eleven,s.twelve,s.thirteen,s.fourteen,s.fifteen,s.id,s.workexperience,
+        bs.outOfContact as outOfContact,bs.stressfollow as stressfollow,bs.remarkshr
+        from tb_base_clazz c
+        left join tb_base_stu_clazz sc on c.clazz_id = sc.clazz_id
+        left join tb_base_studentinfo bs on sc.stu_id = bs.stu_id
+        left join tb_base_achievement s on s.stu_id = bs.stu_id
+        left join tb_stu_appointment app on bs.stu_id = app.stu_id and app.createtime IN (SELECT MAX(a.createtime) FROM tb_stu_appointment a GROUP BY a.stuname)
+        where c.clazz_id = #{clazzid} ORDER BY bs.stu_id,s.category asc,total desc
+    </select>
+
+    <insert id="insertBaseStudentinfo" parameterType="BaseStudentinfo">
+        insert into tb_base_studentinfo
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="stuId != null  and stuId != ''  ">stu_id,</if>
+            <if test="name != null  and name != ''  ">name,</if>
+            <if test="sex != null  and sex != ''  ">sex,</if>
+            <if test="age != null  ">age,</if>
+            <if test="phonenumber != null  and phonenumber != ''  ">phonenumber,</if>
+            <if test="qQnumber != null  and qQnumber != ''  ">QQnumber,</if>
+            <if test="graduateschool != null  and graduateschool != ''  ">graduateschool,</if>
+            <if test="education != null  and education != ''  ">education,</if>
+            <if test="isdelete != null  ">isdelete,</if>
+            <if test="companyId != null  and companyId != ''  ">company_id,</if>
+            <if test="companyname != null  and companyname != ''  ">companyname,</if>
+            <if test="empId != null  and empId != ''  ">emp_id,</if>
+            <if test="empname != null  and empname != ''  ">empname,</if>
+            <if test="isvalid != null  ">isvalid,</if>
+            <if test="entrytime != null  and entrytime != ''  ">entrytime,</if>
+            <if test="salary != null  and salary != ''  ">Salary,</if>
+            <if test="employment != null  ">Employment,</if>
+            <if test="outOfContact != null  ">outOfContact,</if>
+            <if test="remarkshr != null  and remarkshr != ''  ">remarkshr,</if>
+            <if test="workexperience != null  and workexperience != ''  ">workexperience,</if>
+            <if test="campusId != null  and campusId != ''  ">campusId,</if>
+            <if test="idnumber != null  and idnumber != ''  ">idnumber,</if>
+            <if test="stressfollow != null  and stressfollow != ''  ">stressfollow,</if>
+            <if test="idnumberAddress != null  and idnumberAddress != ''  ">idnumberAddress,</if>
+            <if test="major != null  and major != ''  ">major,</if>
+            <if test="category != null  and category != ''  ">category,</if>
+            <if test="violationOfDiscipline != null  and violationOfDiscipline != ''  ">violationOfDiscipline,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="stuId != null  and stuId != ''  ">#{stuId},</if>
+            <if test="name != null  and name != ''  ">#{name},</if>
+            <if test="sex != null  and sex != ''  ">#{sex},</if>
+            <if test="age != null  ">#{age},</if>
+            <if test="phonenumber != null  and phonenumber != ''  ">#{phonenumber},</if>
+            <if test="qQnumber != null  and qQnumber != ''  ">#{qQnumber},</if>
+            <if test="graduateschool != null  and graduateschool != ''  ">#{graduateschool},</if>
+            <if test="education != null  and education != ''  ">#{education},</if>
+            <if test="isdelete != null  ">#{isdelete},</if>
+            <if test="companyId != null  and companyId != ''  ">#{companyId},</if>
+            <if test="companyname != null  and companyname != ''  ">#{companyname},</if>
+            <if test="empId != null  and empId != ''  ">#{empId},</if>
+            <if test="empname != null  and empname != ''  ">#{empname},</if>
+            <if test="isvalid != null  ">#{isvalid},</if>
+            <if test="entrytime != null  and entrytime != ''  ">#{entrytime},</if>
+            <if test="salary != null  and salary != ''  ">#{salary},</if>
+            <if test="employment != null  ">#{employment},</if>
+            <if test="outOfContact != null  ">#{outOfContact},</if>
+            <if test="remarkshr != null  and remarkshr != ''  ">#{remarkshr},</if>
+            <if test="workexperience != null  and workexperience != ''  ">#{workexperience},</if>
+            <if test="campusId != null  and campusId != ''  ">#{campusId},</if>
+            <if test="idnumber != null  and idnumber != ''  ">#{idnumber},</if>
+            <if test="stressfollow != null  and stressfollow != ''  ">#{stressfollow},</if>
+            <if test="idnumberAddress != null  and idnumberAddress != ''  ">#{idnumberAddress},</if>
+            <if test="major != null  and major != ''  ">#{major},</if>
+            <if test="category != null  and category != ''  ">#{category},</if>
+            <if test="violationOfDiscipline != null  and violationOfDiscipline != ''  ">#{violationOfDiscipline},</if>
+        </trim>
+    </insert>
+
+    <update id="updateBaseStudentinfo" parameterType="BaseStudentinfo">
+        update tb_base_studentinfo
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''  ">name = #{name},</if>
+            <if test="sex != null  and sex != ''  ">sex = #{sex},</if>
+            <if test="age != null  ">age = #{age},</if>
+            <if test="phonenumber != null  and phonenumber != ''  ">phonenumber = #{phonenumber},</if>
+            <if test="qQnumber != null  and qQnumber != ''  ">QQnumber = #{qQnumber},</if>
+            <if test="graduateschool != null  and graduateschool != ''  ">graduateschool = #{graduateschool},</if>
+            <if test="education != null  and education != ''  ">education = #{education},</if>
+            <if test="isdelete != null  ">isdelete = #{isdelete},</if>
+            <if test="companyId != null  and companyId != ''  ">company_id = #{companyId},</if>
+            <if test="companyname != null  and companyname != ''  ">companyname = #{companyname},</if>
+            <if test="empId != null  and empId != ''  ">emp_id = #{empId},</if>
+            <if test="empname != null  and empname != ''  ">empname = #{empname},</if>
+            <if test="isvalid != null  ">isvalid = #{isvalid},</if>
+            <if test="entrytime != null  and entrytime != ''  ">entrytime = #{entrytime},</if>
+            <if test="salary != null  and salary != ''  ">Salary = #{salary},</if>
+            <if test="employment != null  ">Employment = #{employment},</if>
+            <if test="outOfContact != null  ">outOfContact = #{outOfContact},</if>
+            <if test="remarkshr != null  and remarkshr != ''  ">remarkshr = #{remarkshr},</if>
+            <if test="workexperience != null  and workexperience != ''  ">workexperience = #{workexperience},</if>
+            <if test="campusId != null  and campusId != ''  ">campusId = #{campusId},</if>
+            <if test="idnumber != null  and idnumber != ''  ">idnumber = #{idnumber},</if>
+            <if test="stressfollow != null  and stressfollow != ''  ">stressfollow = #{stressfollow},</if>
+            <if test="idnumberAddress != null  and idnumberAddress != ''  ">idnumberAddress = #{idnumberAddress},</if>
+            <if test="major != null  and major != ''  ">major = #{major},</if>
+            <if test="category != null  and category != ''  ">category = #{category},</if>
+            <if test="violationOfDiscipline != null  and violationOfDiscipline != ''  ">violationOfDiscipline = #{violationOfDiscipline},</if>
+        </trim>
+        where stu_id = #{stuId}
+    </update>
+
+    <delete id="deleteBaseStudentinfoById" parameterType="String">
+
+        DELETE
+          FROM
+        	tb_base_studentinfo
+        WHERE
+         stu_id = #{stuId}
+    </delete>
+
+    <delete id="deleteBaseStudentinfoByIds" parameterType="String">
+        delete from tb_base_studentinfo where stu_id in
+        <foreach item="stuId" collection="array" open="(" separator="," close=")">
+            #{stuId}
+        </foreach>
+    </delete>
+
+    <select id="selectServerStyById" parameterType="String" resultType="ServerProcessStuVO">
+            SELECT
+                bs.stu_id stuid,
+                bs.NAME,
+                bs.sex,
+                bs.education,
+                bs.category,
+                su.user_name empname,
+                app.createtime,
+                CONCAT_WS('Ω',app.description,app.createtime,NULL) as description,
+                bs.major,
+                bs.violationOfDiscipline
+            FROM
+                tb_base_clazz bc
+                LEFT JOIN tb_base_stu_clazz bsc ON bc.clazz_id = bsc.clazz_id
+                LEFT JOIN tb_base_studentinfo bs ON bsc.stu_id = bs.stu_id
+                LEFT JOIN tb_server_appointment sa ON bs.stu_id = sa.stu_id
+                LEFT JOIN sys_user su ON bc.empname = su.user_id
+                LEFT JOIN (
+                SELECT
+                    sa.stu_id,
+                    sa.stuname,
+                    sa.createtime,
+                    sa.description
+                FROM
+                    tb_server_appointment sa
+                WHERE
+                    sa.createtime IN (
+                    SELECT
+                        MAX( a.createtime )
+                    FROM
+                        tb_server_appointment a
+                    GROUP BY
+                        a.stu_id
+                    )
+                GROUP BY
+                    sa.stu_id
+                ) app ON bs.stu_id = app.stu_id
+            WHERE
+                bc.clazz_id = #{clazzid}
+            GROUP BY
+                stuid
+    </select>
+
+
+
+</mapper>

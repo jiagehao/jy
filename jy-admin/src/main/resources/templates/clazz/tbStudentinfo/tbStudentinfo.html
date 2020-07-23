@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('学员列表')" />
+	<meta charset="utf-8">
+</head>
+<body class="gray-bg">
+    
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<div  style="margin-left: 15px; margin-right: 5px;font-weight:bold" id="subjectName">
+
+				</div>
+				<div  style="margin-left: 15px; margin-right: 5px;font-weight:bold" id="headmasterName">
+
+				</div>
+				<!--<form id="formId">-->
+					<!--<div class="select-list">-->
+						<!--<ul>-->
+							<!--<li>-->
+								<!--学员名字：<input type="text" name="name"/>-->
+							<!--</li>-->
+
+							<!--<li>-->
+								<!--电话号码：<input type="text" name="phonenumber"/>-->
+							<!--</li>-->
+
+							<!--<li>-->
+								<!--公司名称：<input type="text" name="companyname"/>-->
+							<!--</li>-->
+
+							<!--<li>-->
+								<!--<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>-->
+								<!--<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>-->
+							<!--</li>-->
+						<!--</ul>-->
+					<!--</div>-->
+				<!--</form>-->
+			</div>
+			
+	        <div class="btn-group-sm" id="toolbar" role="group" style="margin-bottom: 20px;">
+				<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="clazz:tbStudentinfo:add">
+					<i class="fa fa-plus"></i> 添加学员
+				</a>
+				<a class="btn btn-success" onclick="$.table.importFormExcels('importForm','importForm')" shiro:hasPermission="clazz:tbStudentinfo:group">
+					<i class="fa fa-sitemap"></i> 分组
+				</a>
+				<a class="btn btn-success" onclick="$.table.importExcelCompanyName('importExcelCompanyName','importExcelCompanyName')" shiro:hasPermission="clazz:importExcel:CompanyName">
+					<i class="fa fa-sitemap"></i> 修复
+				</a>
+				<a class="btn btn-success" onclick="$.operate.join('/clazz/tbClazz')">
+					<i class="fa fa-mail-reply"></i> 返回
+				</a>
+				<div id="educations">
+
+				</div>
+				<div id="Personal">
+
+				</div>
+
+				<!--<div class="col-sm-12 search-collapse">-->
+				<!--</div>-->
+				<!--<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="clazz:tbStudentinfo:remove">-->
+					<!--<i class="fa fa-remove"></i> 删除-->
+				<!--</a>-->
+				<!--<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="clazz:tbStudentinfo:export">-->
+						<!--<i class="fa fa-download"></i> 导出-->
+				 <!--</a>-->
+			</div>
+			<form id="importForm" enctype="multipart/form-data" class="mt20 mb10" style="display: none;">
+				<div class="col-xs-offset-1">
+					<input type="file" id="file" name="file"/>
+					<div class="mt10 pt5">
+						<!--<input type="checkbox" id="updateSupport" name="updateSupport" title="如果登录账户已经存在，更新这条数据。"> 是否更新已经存在的用户数据-->
+						&nbsp;    <a onclick="$.table.importTemplate()" class="btn btn-default btn-xs"><i class="fa fa-file-excel-o"></i> 下载模板</a>
+					</div>
+					<font color="red" class="pull-left mt10">
+						提示：仅允许导入“xls”或“xlsx”格式文件！
+					</font>
+				</div>
+			</form>
+			<form id="importExcelCompanyName" enctype="multipart/form-data" class="mt20 mb10" style="display: none;">
+				<div class="col-xs-offset-1">
+					<input type="file" id="files" name="files"/>
+					<div class="mt10 pt5">
+						<!--<input type="checkbox" id="updateSupport" name="updateSupport" title="如果登录账户已经存在，更新这条数据。"> 是否更新已经存在的用户数据-->
+						&nbsp;    <a onclick="$.table.importTemplate()" class="btn btn-default btn-xs"><i class="fa fa-file-excel-o"></i> 下载模板</a>
+					</div>
+					<font color="red" class="pull-left mt10">
+						提示：仅允许导入“xls”或“xlsx”格式文件！
+					</font>
+				</div>
+			</form>
+			<div class="col-sm-12 select-table table-striped jtable">
+				<table class="table table-bordered" id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('clazz:tbStudentinfo:edit')}]];
+        var trackListFlag = [[${@permission.hasPermi('clazz:tbStudentinfo:trackList')}]];
+        var addTrackFlag = [[${@permission.hasPermi('clazz:tbStudentinfo:addTrack')}]];
+        var removeFlag = [[${@permission.hasPermi('clazz:tbStudentinfo:remove')}]];
+        var prefix = ctx + "clazz/tbStudentinfo";
+        //获取地址栏中的值
+        function getUrlParam(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+            var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+            if (r != null) return decodeURI(r[2]); return null; //返回参数值
+        }
+        var clazzid = getUrlParam('clazzId');
+        var subjectName = getUrlParam('subjectName');
+//        $('#formId').append('<input type="hidden" value="'+clazzid+'" id="clazzId" name="clazzId">')
+        $('#importForm').append('<input type="hidden" value="'+clazzid+'" id="clazzId" name="clazzId">')
+        $('#subjectName').append('<h2 style="text-align:center">'+subjectName+'</h2>')
+        $.ajax({
+            url:'/clazz/tbClazz/list',
+            type:"post",
+            data:{'clazzId':clazzid},
+            success:function(data){
+                var numDay = 0;
+                if(data.rows[0].workday<=22){
+                    numDay = 22 - data.rows[0].workday
+				}else if(data.rows[0].workday>22&&data.rows[0].workday<=44){
+                    numDay = 44 - data.rows[0].workday
+                }else if(data.rows[0].workday>44&&data.rows[0].workday<=66){
+                    numDay = 66 - data.rows[0].workday
+                }
+				if(data.rows[0].workday<=66){
+                    $('#headmasterName').append(
+                        '<div class="btn bg-success">' +
+                        '<i class="fa"></i>班主任:'+data.rows[0].headmasterName+'</div>'+
+                        '<div class="btn bg-danger">' +
+                        '<i class="fa"></i>当前班级工作日：「'+data.rows[0].workday+'」天，离下个节点还剩下「'+numDay+'」天</div>'
+                    )
+				}else{
+                    $('#headmasterName').append(
+                        '<div class="btn bg-success">' +
+                        '<i class="fa"></i>班主任:'+data.rows[0].headmasterName+'</div>'+
+                        '<div class="btn bg-danger">' +
+                        '<i class="fa"></i>当前班级工作日：「超出期限」，已经没有下个节点了       </div>'
+                    )
+				}
+
+            }
+        })
+//        $('#headmasterName').append('<div style="text-align:center"><span style="display:inline-block;padding: 5px;border: 1px solid #eee;border-radius: 5px;background: skyblue">班主任：呵呵呵</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="display:inline-block;padding: 5px;border: 1px solid #eee;border-radius: 5px;background: pink">工作日：1个工作日</span></div>')
+
+        $(function() {
+            //获取个人就业率
+            rateOfEmployment()
+            var options = {
+                url: prefix + "/list",
+                queryParams:function (data) {
+                    data.clazzId = getUrlParam('clazzId')
+					return data;
+                },
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+				exportUrl: prefix + "/export",
+                importUrl: prefix + "/importExcelGroup",
+                importExcelCompanyName: "/clazz/tbClazz/importExcelCompanyName",
+                importTemplateUrl: prefix + "/importTemplate",
+                //详情学生详细记录
+                infoUrl: prefix + "/info/{stuId}",
+				//添加学生详细记录
+                addInfoUrl: prefix + "/addInfo/{stuId}",
+                modalName: "就业班学员",
+                search: false,//默认为true显示搜索框功能，设为false隐藏
+                showSearch: false,//默认为true显示检索信息，设为false隐藏
+                showExport: false,
+                showRefresh: true,//默认为true显示刷新按钮，设为false隐藏
+                showToggle: false,//默认为true显示视图切换按钮，设为false隐藏
+                striped:true,
+                pageSize:150,
+                rowStyle:rowStyle,
+                onLoadSuccess:onLoadSuccess,
+                columns: [{
+                    title: "序号",
+                    formatter: function (value, row, index) {
+                        return $.table.serialNumber(index);
+                    },
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center'
+		        },
+				{
+					field : 'name', 
+					title : '姓名',
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center'
+				},
+				{
+					field : 'sex', 
+					title : '性别',
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center'
+				},
+				{
+					field : 'age', 
+					title : '年龄',
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center'
+				},
+                {
+					field : 'education',
+					title : '学历',
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center'
+				},
+                {
+					field : 'isLoan',
+					title : '贷款',
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center',
+                    formatter: function(value, row, index) {
+                        if(row.isLoan=='是'){
+							return '<p href="javascript:;" data-toggle="tooltip" style="color:red" >'+value+'</p>'
+                        }
+                        return '<p href="javascript:;" data-toggle="tooltip">'+value+'</p>'
+                    }
+				},
+                {
+					field : 'major',
+					title : '专业',
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    width:120,
+                    falign:'center'
+				},
+					{
+						field : 'graduationTime',
+						title : '毕业时间',
+						valign:'middle',
+						align:'center',
+						halign:'center',
+						width:120,
+						falign:'center'
+					},
+				{
+					field : 'phonenumber',
+					title : '电话号码',
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center'
+				},
+				{
+					field : 'salary',
+					title : '薪资',
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center',
+
+
+                },
+				{
+					field : 'companyname', 
+					title : '入职公司',
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    width:150,
+                    falign:'center'
+				},
+				{
+					field : 'entrytime',
+					title : '入职时间',
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center'
+				},
+                    {
+                        field : 'description',
+                        title : '记录时间',
+                        valign:'middle',
+                        align:'center',
+                        halign:'center',
+                        width:30,
+                        falign:'center',
+                        formatter: function(value, row, index) {
+                            console.log(row)
+                            var val = value.split('Ω')
+                            var v= val[1]==undefined?'':val[1]
+                            var myDate = new Date();
+                            var dat;
+                            var year=myDate.getFullYear();        //获取当前年
+                            var month=myDate.getMonth()+1;   //获取当前月
+                            var date=myDate.getDate();            //获取当前日
+                            dat=year+"-"+month+"-"+date;
+                            var days = daysBetween(v,dat)
+							if(row.employment==0){
+                                if(isNaN(days)){
+                                    return '<p href="javascript:;" data-toggle="tooltip"></p>'
+                                }else if(days>=3){
+                                    return '<p href="javascript:;" data-toggle="tooltip" style="color:red" >'+days+'天</p>'
+                                }else{
+                                    return '<p href="javascript:;" data-toggle="tooltip">'+days+'天</p>'
+                                }
+							}
+                            return '<p href="javascript:;" data-toggle="tooltip">结束</p>'
+                        }
+                    },
+                    {
+                        field : 'description',
+                        title : '记录信息',
+                        valign:'middle',
+                        align:'center',
+                        halign:'center',
+                        width:150,
+                        falign:'center',
+                        formatter: function(value, row, index) {
+                            var val = value.split('Ω')
+                            var v= val[1]==undefined?'':val[1]
+                            var myDate = new Date();
+                            var dat;
+                            var year=myDate.getFullYear();        //获取当前年
+                            var month=myDate.getMonth()+1;   //获取当前月
+                            var date=myDate.getDate();            //获取当前日
+                            dat=year+"-"+month+"-"+date;
+                            var days = daysBetween(v,dat)
+                            if(row.employment==0) {
+                                if (isNaN(days)) {
+                                    return '<p href="javascript:;" data-toggle="tooltip">' + val[0] + '</p>'
+                                } else if (days >= 3) {
+                                    return '<p href="javascript:;" data-toggle="tooltip" style="color:red">' + val[0] + '</p>'
+                                } else {
+                                    return '<p href="javascript:;" data-toggle="tooltip">' + val[0] + '</p>'
+                                }
+                            }
+                            return '<p href="javascript:;" data-toggle="tooltip">' + val[0] + '</p>'
+                        }
+                    },
+				{
+					field : 'empName',
+					title : '就业指导',
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center'
+				},
+		        {
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	var actions = [];
+                        actions.push('<a class="btn btn-info btn-xs ' + trackListFlag + '" href="javascript:;" onclick="$.operate.openStudentInfo(\'' + row.stuId + '\')"><i class="fa fa-comments-o"></i>查询记录</a> ');
+                        actions.push('<a class="btn btn-primary btn-xs ' + addTrackFlag + '" href="javascript:;" onclick="$.operate.addStudentInfo(\'' + row.stuId + '\')"><i class="fa fa-commenting"></i>添加记录</a><br /> ');
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:;" onclick="$.operate.edit(\'' + row.stuId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:;" onclick="$.operate.remove(\'' + row.stuId + '\')"><i class="fa fa-remove"></i>删除</a>');
+						return actions.join('');
+		            },
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center'
+		        }]
+            }
+
+            $.table.init(options);
+
+        });
+        function onLoadSuccess(row,index){
+            $('#educations').empty()
+            var b=0,d=0,g=0,y=0;
+            var arr = ['本科','大专','研究生','其他']
+
+            var rows=row.rows;
+            for(var i=0;i<rows.length;i++){
+                if(rows[i].education=="本科"){
+                    b++;
+                }else if(rows[i].education=="大专"){
+                    d++;
+                }else if(rows[i].education=="研究生"){
+                    y++;
+                }else{
+                    g++;
+                }
+            }
+
+            for(var o=0;o<arr.length;o++){
+
+                var srt =  ''
+                switch (o){
+                    case 0:
+                        srt +='<div class="btn bg-danger" style="font-size: 12px"><i class="fa"></i>'+arr[o]+'    占比：'+(b/rows.length*100).toFixed(2)+'%共：'+b+'人</div>'
+                        break
+                    case 1:
+                        srt +='<div class="btn bg-info" style="font-size: 12px"><i class="fa"></i>'+arr[o]+'    占比：'+(d/rows.length*100).toFixed(2)+'%共：'+d+'人</div>'
+                        break
+                    case 2:
+                        srt +='<div class="btn bg-warning" style="font-size: 12px"><i class="fa"></i>'+arr[o]+'    占比：'+(y/rows.length*100).toFixed(2)+'%共：'+y+'人</div>'
+                        break
+                    case 3:
+                        srt +='<div class="btn bg-success" style="font-size: 12px"><i class="fa"></i>'+arr[o]+'    占比：'+(g/rows.length*100).toFixed(2)+'%共：'+g+'人</div>'
+                        break
+                }
+                $('#educations').append(srt)
+            }
+
+            $('[data-toggle="tooltip"]').tooltip();
+        }
+		function rateOfEmployment(){
+            $.ajax({
+                url:"/clazz/tbStudentinfo/getPersonal?clazzId="+clazzid,
+                async:true,
+                success:function(data){
+                    var color= "bg-success"
+                    if(data.length>0){
+                        var html = '';
+                        for(var i=0;i<data.length;i++){
+                            var salary = data[i].salary==null?0:data[i].salary
+                            var total = data[i].total==null?0:data[i].total
+
+                            html += '<div class="btn '+color+'" style="font-size: 12px">' +
+								'<i class="fa"></i>姓名:'+data[i].empname+'    薪资：'+salary+'￥  就业率：'+total+'%    共有：'+data[i].counts+'人   </div>';
+                            i%2==0?(color = "bg-info"):(color = "bg-danger")
+                        }
+                        $('#Personal').append(html);
+                    }
+                }
+            });
+		}
+        function rowStyle(row, index) {
+            var classes = ['active', 'success', 'info', 'warning', 'danger'];
+            if (row.employment!='0') {
+                return {
+                    classes: classes[1]
+                };
+            }
+            return {};
+        }
+
+    </script>
+</body>
+</html>

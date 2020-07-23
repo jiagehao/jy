@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jy.system.mapper.TbStudentinfoMapper">
+    
+    <resultMap type="TbStudentinfo" id="TbStudentinfoResult">
+        <result property="stuId"    column="stu_id"    />
+        <result property="name"    column="name"    />
+        <result property="sex"    column="sex"    />
+        <result property="age"    column="age"    />
+        <result property="phonenumber"    column="phonenumber"    />
+        <result property="qQnumber"    column="QQnumber"    />
+        <result property="graduateschool"    column="graduateschool"    />
+        <result property="education"    column="education"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="companyname"    column="companyname"    />
+        <result property="empId"    column="emp_id"    />
+        <result property="salary"    column="Salary"    />
+        <result property="employment"    column="Employment"    />
+        <result property="outOfContact"    column="outOfContact"    />
+        <result property="entrytime"    column="entrytime"    />
+        <result property="entrytyears"    column="entrytyears"    />
+    </resultMap>
+	
+	<sql id="selectTbStudentinfoVo">
+        select stu_id, name, sex, age, phonenumber, QQnumber, graduateschool, education, company_id, companyname, emp_id, Salary, Employment, outOfContact, entrytime,entrytyears from tb_studentinfo
+    </sql>
+	
+    <select id="selectTbStudentinfoList" parameterType="TbStudentinfo" resultMap="TbStudentinfoResult">
+        SELECT
+        s.stu_id,
+        u.user_name AS userName,
+        c.clazzname,
+        c.subjectname,
+        s.`name`,
+        s.sex,
+        s.age,
+        s.phonenumber,
+        s.education,
+        s.companyname,
+        s.Salary,
+        s.entrytime,
+        s.entrytyears
+        FROM
+        tb_studentinfo s
+        LEFT JOIN tb_stu_clazz tsc ON s.stu_id = tsc.stu_id
+        LEFT JOIN tb_clazz c ON tsc.clazz_id = c.clazz_id
+        LEFT JOIN sys_user u ON s.emp_id = u.user_id
+        <where>
+            s.Employment = 1
+            <if test="stuId != null  and stuId != '' "> and stu_id = #{stuId}</if>
+             <if test="name != null  and name != '' "> and name LIKE CONCAT(CONCAT('%', #{name}), '%')</if>
+             <if test="sex != null  and sex != '' "> and sex = #{sex}</if>
+             <if test="age != null "> and age = #{age}</if>
+             <if test="phonenumber != null  and phonenumber != '' "> and phonenumber = #{phonenumber}</if>
+             <if test="qQnumber != null  and qQnumber != '' "> and QQnumber = #{qQnumber}</if>
+             <if test="graduateschool != null  and graduateschool != '' "> and graduateschool = #{graduateschool}</if>
+             <if test="education != null  and education != '' "> and education LIKE CONCAT(CONCAT('%', #{education}), '%')</if>
+             <if test="companyId != null  and companyId != '' "> and company_id = #{companyId}</if>
+             <if test="companyname != null  and companyname != '' "> and companyname LIKE CONCAT(CONCAT('%', #{companyname}), '%')</if>
+             <if test="empId != null  and empId != '' "> and emp_id = #{empId}</if>
+             <if test="salary != null  and salary != '' "> and Salary = #{salary}</if>
+             <if test="employment != null "> and Employment = #{employment}</if>
+             <if test="outOfContact != null "> and outOfContact = #{outOfContact}</if>
+             <if test="entrytime != null  and entrytime != '' "> and entrytime = #{entrytime}</if>
+             <if test="entrytyears != null  and entrytyears != '' "> and entrytyears = #{entrytyears}</if>
+         </where>
+        ORDER BY s.entrytime desc
+    </select>
+    <select id="selectTbStudentinfoLists" parameterType="com.jy.system.domain.vo.StudentVO" resultType="com.jy.system.domain.vo.StudentVO">
+        select CONCAT_WS('Ω',app.description,app.createtime,NULL) as description,ts.stu_id as stuId,
+        ts.name, ts.sex, ts.age,
+        ts.phonenumber, ts.qQnumber,
+        ts.graduateschool, ts.education,
+        ts.company_id, ts.companyname,
+        ts.emp_id as empId, ts.Salary,
+        ts.outOfContact, ts.entrytime,
+        su.user_name as empName,
+        ts.Employment,ts.entrytyears,
+        ts.major,
+        ts.graduationTime,
+        ts.isWork,
+        ts.addr,
+        ts.isLoan,
+        ts.landlordNum
+        from tb_studentinfo ts
+        left join tb_stu_clazz tsc on ts.stu_id = tsc.stu_id
+        left join tb_clazz tc on tsc.clazz_id = tc.clazz_id
+        left join sys_user su on ts.emp_id = su.user_id
+        left join (
+        SELECT app.stu_id,app.stuname,app.createtime,app.description
+        FROM tb_stu_appointment app
+        WHERE app.createtime IN (
+        SELECT MAX(a.createtime)
+        FROM tb_stu_appointment a
+        GROUP BY a.stu_id
+        ) GROUP BY app.stu_id
+        ) app on ts.stu_id = app.stu_id
+        where tc.clazz_id = #{clazzId}
+            <if test="name != null  and name != '' "> and ts.name = #{name}</if>
+            <if test="userName != null  and userName != '' "> and su.user_name = #{userName}</if>
+            <if test="phonenumber != null  and phonenumber != '' "> and ts.phonenumber = #{phonenumber}</if>
+            <if test="companyname != null  and companyname != '' "> and ts.companyname = #{companyname}</if>
+        ORDER BY empName desc,ts.Employment asc
+    </select>
+    <!--获取班级个人就业率-->
+    <select id="getPersonalRateOfEmployment" resultType="com.jy.system.domain.vo.PersonalVO" parameterType="String">
+    SELECT
+        sba.`user_id` 				AS empId,
+        sba.`user_name` 			AS empname,
+        ROUND((COUNT(*)/a.counttow * 100),2) as total,
+        ROUND(AVG(ts.`Salary`),2) 	AS salary,
+        a.counttow counts
+    FROM tb_studentinfo ts
+    LEFT JOIN tb_stu_clazz tsc  ON ts.stu_id = tsc.stu_id
+    LEFT JOIN tb_clazz tc       ON tsc.clazz_id = tc.clazz_id
+    LEFT JOIN sys_user sba      ON ts.`emp_id` = sba.user_id
+	left join (
+	select
+	    sba.`user_id`,COUNT(*)      AS `counttow`
+	FROM tb_studentinfo ts
+    LEFT JOIN tb_stu_clazz tsc ON ts.stu_id = tsc.stu_id
+    LEFT JOIN tb_clazz tc ON tsc.clazz_id = tc.clazz_id
+	LEFT JOIN sys_user sba ON ts.`emp_id` = sba.user_id
+	WHERE 1=1 AND tc.`clazz_id` = #{clazzId}  GROUP BY sba.`user_name`
+	          ) a on sba.user_id=a.user_id
+    WHERE 1=1 AND tc.`clazz_id` = #{clazzId}  AND ts.`Employment` = '1' GROUP BY sba.`user_name`
+    </select>
+
+    <select id="selectTbStudentinfoById" parameterType="String" resultMap="TbStudentinfoResult">
+        <include refid="selectTbStudentinfoVo"/>
+        where stu_id = #{stuId}
+    </select>
+
+    <select id="selectTbStudentinfoByUserId" parameterType="String" resultType="TbStudentinfo">
+        SELECT
+            ts.stu_id as stuId,sba.user_id as userId,sba.user_name as userId
+        FROM
+            tb_studentinfo ts
+            LEFT JOIN tb_stu_clazz tsc ON ts.stu_id = tsc.stu_id
+            LEFT JOIN tb_clazz tc ON tsc.clazz_id = tc.clazz_id
+            LEFT JOIN sys_user sba ON sba.user_name = #{userName}
+            where ts.name = #{name} and tc.clazz_id = #{clazzId}
+    </select>
+
+    <select id="selectTbStudentinfoByClazzId" parameterType="StudentInfoVO" resultType="StudentVO">
+        SELECT
+        ts.stu_id as stuId,ts.name
+        FROM
+        tb_studentinfo ts
+        LEFT JOIN tb_stu_clazz tsc ON ts.stu_id = tsc.stu_id
+        LEFT JOIN tb_clazz tc ON tsc.clazz_id = tc.clazz_id
+        where tc.clazz_id = #{clazzId} and ts.name = #{name}
+    </select>
+    <select id="selectStuNoEmployment" parameterType="StudentVO" resultType="StudentVO">
+        select CONCAT_WS('Ω',app.description,app.createtime,NULL) as description,ts.stu_id as stuId,
+        ts.name, CAST(tc.clazzname AS SIGNED) clazzname,ts.sex, ts.age,
+        ts.phonenumber, ts.qQnumber,
+        ts.graduateschool, ts.education,
+        ts.company_id, ts.companyname,
+        ts.emp_id as empId, ts.Salary,
+        ts.outOfContact, ts.entrytime,
+        su.user_name as empName,
+        ts.Employment,ts.entrytyears
+        from tb_studentinfo ts
+        left join tb_stu_clazz tsc on ts.stu_id = tsc.stu_id
+        left join tb_clazz tc on tsc.clazz_id = tc.clazz_id
+        left join sys_user su on ts.emp_id = su.user_id
+        left join (
+        SELECT app.stu_id,app.stuname,app.createtime,app.description
+        FROM tb_stu_appointment app
+        WHERE app.createtime IN (
+        SELECT MAX(a.createtime)
+        FROM tb_stu_appointment a
+        GROUP BY a.stu_id
+        ) GROUP BY app.stu_id
+        ) app on ts.stu_id = app.stu_id where ts.Employment = 0 and ts.emp_id = #{empId} and getWorkDay(tc.endtime) &lt;= 66 ORDER BY clazzname desc,ts.Employment asc
+    </select>
+
+    <insert id="insertTbStudentinfo" parameterType="TbStudentinfo">
+        insert into tb_studentinfo
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="stuId != null  and stuId != ''  ">stu_id,</if>
+			<if test="name != null  and name != ''  ">name,</if>
+			<if test="sex != null  and sex != ''  ">sex,</if>
+			<if test="age != null  ">age,</if>
+			<if test="phonenumber != null  and phonenumber != ''  ">phonenumber,</if>
+			<if test="qQnumber != null  and qQnumber != ''  ">QQnumber,</if>
+			<if test="graduateschool != null  and graduateschool != ''  ">graduateschool,</if>
+			<if test="education != null  and education != ''  ">education,</if>
+
+
+			<if test="major != null  and major != ''  ">major,</if>
+			<if test="graduationTime != null  and graduationTime != ''  ">graduationTime,</if>
+			<if test="isWork != null  and isWork != ''  ">isWork,</if>
+			<if test="addr != null  and addr != ''  ">addr,</if>
+			<if test="landlordNum != null  and landlordNum != ''  ">landlordNum,</if>
+			<if test="isLoan != null  and isLoan != ''  ">isLoan,</if>
+
+
+			<if test="companyId != null  and companyId != ''  ">company_id,</if>
+			<if test="companyname != null  and companyname != ''  ">companyname,</if>
+			<if test="empId != null  and empId != ''  ">emp_id,</if>
+			<if test="salary != null  and salary != ''  ">Salary,</if>
+			<if test="employment != null  ">Employment,</if>
+			<if test="outOfContact != null  ">outOfContact,</if>
+			<if test="entrytime != null  and entrytime != ''  ">entrytime,</if>
+			<if test="entrytyears != null  and entrytyears != ''  ">entrytyears,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="stuId != null  and stuId != ''  ">#{stuId},</if>
+			<if test="name != null  and name != ''  ">#{name},</if>
+			<if test="sex != null  and sex != ''  ">#{sex},</if>
+			<if test="age != null  ">#{age},</if>
+			<if test="phonenumber != null  and phonenumber != ''  ">#{phonenumber},</if>
+			<if test="qQnumber != null  and qQnumber != ''  ">#{qQnumber},</if>
+			<if test="graduateschool != null  and graduateschool != ''  ">#{graduateschool},</if>
+			<if test="education != null  and education != ''  ">#{education},</if>
+
+			<if test="major != null  and major != ''  ">#{major},</if>
+			<if test="graduationTime != null  and graduationTime != ''  ">#{graduationTime},</if>
+			<if test="isWork != null  and isWork != ''  ">#{isWork},</if>
+			<if test="addr != null  and addr != ''  ">#{addr},</if>
+			<if test="landlordNum != null  and landlordNum != ''  ">#{landlordNum},</if>
+			<if test="isLoan != null  and isLoan != ''  ">#{isLoan},</if>
+
+
+			<if test="companyId != null  and companyId != ''  ">#{companyId},</if>
+			<if test="companyname != null  and companyname != ''  ">#{companyname},</if>
+			<if test="empId != null  and empId != ''  ">#{empId},</if>
+			<if test="salary != null  and salary != ''  ">#{salary},</if>
+			<if test="employment != null  ">#{employment},</if>
+			<if test="outOfContact != null  ">#{outOfContact},</if>
+			<if test="entrytime != null  and entrytime != ''  ">#{entrytime},</if>
+			<if test="entrytyears != null  and entrytyears != ''  ">#{entrytime},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbStudentinfo" parameterType="TbStudentinfo">
+        update tb_studentinfo
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''  ">name = #{name},</if>
+            <if test="sex != null  and sex != ''  ">sex = #{sex},</if>
+            <if test="age != null  ">age = #{age},</if>
+            <if test="phonenumber != null  and phonenumber != ''  ">phonenumber = #{phonenumber},</if>
+            <if test="qQnumber != null  and qQnumber != ''  ">QQnumber = #{qQnumber},</if>
+            <if test="graduateschool != null  and graduateschool != ''  ">graduateschool = #{graduateschool},</if>
+            <if test="education != null  and education != ''  ">education = #{education},</if>
+            <if test="companyId != null  and companyId != ''  ">company_id = #{companyId},</if>
+            <if test="companyname != null">companyname = #{companyname},</if>
+            <if test="empId != null  and empId != ''  ">emp_id = #{empId},</if>
+            <if test="salary != null  and salary != ''  ">Salary = #{salary},</if>
+            <if test="employment != null  ">Employment = #{employment},</if>
+            <if test="outOfContact != null  ">outOfContact = #{outOfContact},</if>
+            <if test="entrytime != null  and entrytime != ''  ">entrytime = #{entrytime},</if>
+            <if test="entrytyears != null  and entrytyears != ''  ">entrytyears = #{entrytyears},</if>
+        </trim>
+        where stu_id = #{stuId}
+    </update>
+
+	<delete id="deleteTbStudentinfoById" parameterType="String">
+        delete from tb_studentinfo where stu_id = #{stuId}
+    </delete>
+
+    <delete id="deleteTbStudentinfoByIds" parameterType="String">
+        delete from tb_studentinfo where stu_id in 
+        <foreach item="stuId" collection="array" open="(" separator="," close=")">
+            #{stuId}
+        </foreach>
+    </delete>
+    
+</mapper>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('新增学员')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-baseStudentInfo-add" th:object="${baseStudentinfo}">
+			<!--是否留级默认1-->
+			<input id="employment" name="employment" type="hidden"  value="1"/>
+			<!--是否流失默认0-->
+			<input id="outOfContact" name="outOfContact" type="hidden"  value="0"/>
+			<!--是否重点关注默认0-->
+			<input id="stressfollow" name="stressfollow" type="hidden"  value="0"/>
+			<!--是否删除-->
+			<input id="isdelete" name="isdelete" type="hidden"  value="0"/>
+			<!--是否有效-->
+			<input id="isvalid" name="isvalid" type="hidden"  value="1"/>
+			<input id="clazz" name="clazz" type="hidden" th:field="*{clazz}"/>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">学员名字：</label>
+				<div class="col-sm-8">
+					<input id="name" name="name" value="哦哦钦佩" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">性别：</label>
+				<div class="col-sm-8">
+					<select  id="sex" name="sex" class="form-control">
+							<option value="男">男</option>
+							<option value="女">女</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">年龄：</label>
+				<div class="col-sm-8">
+					<input id="age" name="age" class="form-control"value="19" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">电话号码：</label>
+				<div class="col-sm-8">
+					<input id="phonenumber" name="phonenumber"value="13388899981" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">QQ：</label>
+				<div class="col-sm-8">
+					<input id="qQnumber" name="qQnumber" value="998898889" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">毕业学校：</label>
+				<div class="col-sm-8">
+					<input id="graduateschool" name="graduateschool"value="全方位" class="form-control" type="text">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-3 control-label">专业：</label>
+				<div class="col-sm-8">
+					<select  id="education" name="education" class="form-control">
+						<option value="高中">高中</option>
+						<option value="专科">专科</option>
+						<option value="本科">本科</option>
+						<option value="其他">其他</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-3 control-label">身份证号码：</label>
+				<div class="col-sm-8">
+					<input id="idnumber" name="idnumber" value="340823198803087537" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">身份证地址：</label>
+				<div class="col-sm-8">
+					<input id="idnumberAddress" name="idnumberAddress"value="1人让穷人" class="form-control" type="text">
+				</div>
+			</div>
+		</form>
+	</div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "clazz/tbBaseStudentinfo"
+        jQuery.validator.addMethod("isMobile", function(value, element) {
+            var length = value.length;
+            var mobile = /^(13[0-9]{9})|(18[0-9]{9})|(14[0-9]{9})|(17[0-9]{9})|(15[0-9]{9})$/;
+            return this.optional(element) || (length == 11 && mobile.test(value));
+        }, "请正确填写手机号码");
+
+        jQuery.validator.addMethod("isIdCard", function(value, element) {
+            //身份证号码为15位或者18位，15位时全为数字，18位前17位为数字，最后一位是校验位，可能为数字或字符X
+            var reg = /(^\d{15}$)|(^\d{17}(\d|X)$)/;
+            if(reg.test(value) === false)
+            {
+                return false;
+            }
+            // $.operate.checkIDcard(prefix+"/checkIDcard",{"IDcard":value})
+            return true;
+        }, "请正确填写公民身份证号码");
+
+        //匹配非法字符
+        jQuery.validator.addMethod("regValidate", function(value, element) {
+            var pat=/[`~!@#$%^&*()_+<>?:"{},.\/;'[\]]/im;
+            if (pat.test(value)==true){
+                return false;
+            } else{
+                return true;
+            }
+        }, "输入的信息含有非法字符！");
+
+        //获取地址栏中的值
+        function getUrlParam(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+            var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+            if (r != null) return unescape(r[2]);
+            return null; //返回参数值
+        }
+
+        var clazzid = getUrlParam('clazzId');
+
+
+		$("#form-baseStudentInfo-add").validate({
+			rules:{
+                name:{
+                    required:true,
+                    regValidate:true,
+                },
+                sex:{
+                    required:true,
+                },
+                age:{
+                    range:[17,40],
+                    required:true,
+                },
+                phonenumber:{
+                    isMobile:true,
+                    digits:true,
+                    required:true,
+                },
+                qQnumber:{
+                    rangelength:[5,10],
+                    required:true,
+                    digits:true,
+                },
+                graduateschool:{
+                    required:true,
+                    regValidate:true,
+                },
+                education:{
+                    required:true,
+                },
+                idnumber:{
+                    isIdCard:true,
+                    required:true,
+                },
+                idnumberAddress:{
+                    required:true,
+                    regValidate:true,
+                },
+			},
+			focusCleanup: true
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/add", $('#form-baseStudentInfo-add').serialize());
+	        }
+	    }
+
+		
+	</script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jy.system.mapper.TbWorkdayMapper">
+    
+    <resultMap type="TbWorkday" id="TbWorkdayResult">
+        <result property="id"    column="id"    />
+        <result property="title"    column="title"    />
+        <result property="holidayDate"    column="holiday_date"    />
+    </resultMap>
+	
+	<sql id="selectTbWorkdayVo">
+        select id, title, holiday_date from tb_workday
+    </sql>
+	
+    <select id="selectTbWorkdayList" parameterType="TbWorkday" resultMap="TbWorkdayResult">
+        <include refid="selectTbWorkdayVo"/>
+        <where>  
+            <if test="id != null  and id != '' "> and id = #{id}</if>
+             <if test="title != null  and title != '' "> and title = #{title}</if>
+             <if test="holidayDate != null "> and holiday_date = #{holidayDate}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbWorkdayById" parameterType="String" resultMap="TbWorkdayResult">
+        <include refid="selectTbWorkdayVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertTbWorkday" parameterType="TbWorkday">
+        insert into tb_workday
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">id,</if>
+			<if test="title != null  and title != ''  ">title,</if>
+			<if test="holidayDate != null  ">holiday_date,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">#{id},</if>
+			<if test="title != null  and title != ''  ">#{title},</if>
+			<if test="holidayDate != null  ">#{holidayDate},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbWorkday" parameterType="TbWorkday">
+        update tb_workday
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="title != null  and title != ''  ">title = #{title},</if>
+            <if test="holidayDate != null  ">holiday_date = #{holidayDate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteTbWorkdayById" parameterType="String">
+        delete from tb_workday where id = #{id}
+    </delete>
+	
+    <delete id="deleteTbWorkdayByIds" parameterType="String">
+        delete from tb_workday where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

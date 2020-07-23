@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/css/font-awesome.min.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/css/timeline.css}">
+
+    <!--<link rel="stylesheet" type="text/css" th:href="@{/css/history.css}">-->
+    <!--<script type="text/javascript"  th:href="@{/js/jquery.js}" ></script>-->
+    <!--<script type="text/javascript" th:href="@{/js/jquery.mousewheel.js}" ></script>-->
+    <!--<script type="text/javascript" th:href="@{/js/jquery.easing.js}"></script>-->
+    <!--<script type="text/javascript"  th:href="@{/js/history.js}"></script>-->
+
+    <th:block th:include="include :: header('修改学员')"/>
+</head>
+<body class="white-bg">
+<div class="wrapper">
+
+    <div class="container-fluid">
+        <div class="col-md-12">
+
+            <input th:object="${tbStudentinfo}" type="hidden">
+            <input th:object="${infoList}" type="hidden">
+
+            <div class="row">
+                <h2>
+
+                    学员记录详情信息
+
+                </h2>
+
+                <div class="timeline timeline-single-column">
+                    <div class="timeline-item timeline-item-arrow-sm">
+                        <div class="timeline-point timeline-point-info">
+                            <i class="fa fa-star"></i>
+                        </div>
+
+
+                        <div class="timeline-event timeline-event-info">
+                            <table class="table table-striped table-hover">
+                                <tr>
+                                    <th>学员个人资料信息</th>
+                                    <th></th>
+                                </tr>
+                                <tr>
+                                    <td>姓名:</td>
+                                    <td>
+                                        <div class="form-control-static" th:text="${tbStudentinfo.name}">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>年龄:</td>
+                                    <td>
+                                        <div class="form-control-static" th:text="${tbStudentinfo.age}">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>联系电话:
+                                    </td>
+                                    <td>
+                                        <div class="form-control-static" th:text="${tbStudentinfo.phonenumber}">
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <span class="timeline-label">
+					<span class="label label-danger">记录信息节点</span>
+				</span>
+
+
+
+                    <div class="timeline-item" th:each="info:${infoList}">
+
+
+
+                        <div class="timeline-point timeline-point-warning" th:if="${info.isfoul} eq 0" >
+                            <i class="fa fa-star"></i>
+                        </div>
+                        <div class="timeline-point timeline-point-danger" th:if="${info.isfoul} eq 1">
+                            <i class="fa fa-star"></i>
+                        </div>
+
+
+
+                        <!--黄色-->
+                        <div class="timeline-event timeline-event-warning" th:if="${info.isfoul} eq 0 ">
+                            <div class="timeline-heading">
+                                <h4>记录人:
+                                    <div class="form-control-static" th:text="${info.empName}">
+                                    </div>
+                                </h4>
+                            </div>
+                            <div class="timeline-body">
+                                <p>跟踪记录内容:
+
+                                <div class="form-control-static" th:text="${info.description}">
+                                </div>
+
+                                </p>
+                            </div>
+                            <div class="timeline-footer">
+                                <p class="text-left" >记录时间:
+                                <div class="form-control-static" th:text="${info.appointtime}">
+                                </div>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!--红色-->
+                        <div class="timeline-event timeline-event-danger" th:if="${info.isfoul} eq 1 ">
+                            <div class="timeline-heading">
+                                <h4>记录人:
+                                    <div class="form-control-static" th:text="${info.empName}">
+                                    </div>
+                                </h4>
+                            </div>
+                            <div class="timeline-body">
+                                <p>违纪记录内容:
+
+                                <div class="form-control-static" th:text="${info.description}">
+                                </div>
+
+                                </p>
+                            </div>
+                            <div class="timeline-footer">
+                                <p class="text-left" >记录时间:
+                                <div class="form-control-static" th:text="${info.appointtime}">
+                                </div>
+                                </p>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+
+                    <span class="timeline-label">
+					<a href="#" class="btn btn-default" title="回到顶部">
+						<i class="fa fa-fw fa-history"></i>
+					</a>
+				</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<!--<div class="wrapper wrapper-content animated fadeInRight ibox-content">-->
+<!--<form class="form-horizontal m" id="form-tbStudentinfo-edit" th:object="${tbStudentinfo}">-->
+<!--<input id="stuId" name="stuId" th:field="*{stuId}"  type="hidden">-->
+<!--<div class="form-group">	-->
+<!--<label class="col-sm-3 control-label">学员名字：</label>-->
+<!--<div class="col-sm-8">-->
+<!--<input id="name" name="name" th:field="*{name}" class="form-control" type="text">-->
+<!--</div>-->
+<!--</div>-->
+<!--<div class="form-group">	-->
+<!--<label class="col-sm-3 control-label">电话号码：</label>-->
+<!--<div class="col-sm-8">-->
+<!--<input id="phonenumber" name="phonenumber" th:field="*{phonenumber}" class="form-control" type="text">-->
+<!--</div>-->
+<!--</div>-->
+<!--<div class="form-group">	-->
+<!--<label class="col-sm-3 control-label">公司名称：</label>-->
+<!--<div class="col-sm-8">-->
+<!--<input id="companyname" name="companyname" th:field="*{companyname}" class="form-control" type="text">-->
+<!--</div>-->
+<!--</div>-->
+<!--<div class="form-group">	-->
+<!--<label class="col-sm-3 control-label">薪资：</label>-->
+<!--<div class="col-sm-8">-->
+<!--<input id="salary" name="salary" th:field="*{salary}" class="form-control" type="text">-->
+<!--</div>-->
+<!--</div>-->
+<!--<div class="form-group">	-->
+<!--<label class="col-sm-3 control-label">入职时间：</label>-->
+<!--<div class="col-sm-8">-->
+<!--<input id="entrytime" name="entrytime" th:field="*{entrytime}" class="form-control" type="text">-->
+<!--</div>-->
+<!--</div>-->
+<!--</form>-->
+<!--</div>-->
+<div th:include="include::footer"></div>
+<script type="text/javascript">
+    var prefix = ctx + "clazz/tbStudentinfo";
+
+
+</script>
+</body>
+</html>

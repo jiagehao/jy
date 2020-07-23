@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jy.system.mapper.BaseInterviewMapper">
+    
+    <resultMap type="BaseInterview" id="BaseInterviewResult">
+        <result property="interviewid"    column="interviewid"    />
+        <result property="name"    column="name"    />
+        <result property="sex"    column="sex"    />
+        <result property="age"    column="age"    />
+        <result property="education"    column="education"    />
+        <result property="problemOne"    column="problemOne"    />
+        <result property="remarkshrOne"    column="remarkshrOne"    />
+        <result property="problemTow"    column="problemTow"    />
+        <result property="remarkshrTow"    column="remarkshrTow"    />
+        <result property="problemThree"    column="problemThree"    />
+        <result property="remarkshrThree"    column="remarkshrThree"    />
+        <result property="problemFour"    column="problemFour"    />
+        <result property="remarkshrFour"    column="remarkshrFour"    />
+        <result property="endtime"    column="endtime"    />
+        <result property="clazztime"    column="clazztime"    />
+        <result property="clazzid"    column="clazzid"    />
+        <result property="stuid"    column="stuid"    />
+    </resultMap>
+	
+	<sql id="selectBaseInterviewVo">
+        select interviewid, name, sex, age, education, problemOne, remarkshrOne, problemTow, remarkshrTow, problemThree, remarkshrThree, problemFour, remarkshrFour, endtime, clazztime, clazzid, stuid from tb_base_interview
+    </sql>
+	
+    <select id="selectBaseInterviewList" parameterType="BaseInterview" resultMap="BaseInterviewResult">
+        <include refid="selectBaseInterviewVo"/>
+        <where>  
+            <if test="interviewid != null  and interviewid != '' "> and interviewid = #{interviewid}</if>
+             <if test="name != null  and name != '' "> and name = #{name}</if>
+             <if test="sex != null  and sex != '' "> and sex = #{sex}</if>
+             <if test="age != null  and age != '' "> and age = #{age}</if>
+             <if test="education != null  and education != '' "> and education = #{education}</if>
+             <if test="problemOne != null  and problemOne != '' "> and problemOne = #{problemOne}</if>
+             <if test="remarkshrOne != null  and remarkshrOne != '' "> and remarkshrOne = #{remarkshrOne}</if>
+             <if test="problemTow != null  and problemTow != '' "> and problemTow = #{problemTow}</if>
+             <if test="remarkshrTow != null  and remarkshrTow != '' "> and remarkshrTow = #{remarkshrTow}</if>
+             <if test="problemThree != null  and problemThree != '' "> and problemThree = #{problemThree}</if>
+             <if test="remarkshrThree != null  and remarkshrThree != '' "> and remarkshrThree = #{remarkshrThree}</if>
+             <if test="problemFour != null  and problemFour != '' "> and problemFour = #{problemFour}</if>
+             <if test="remarkshrFour != null  and remarkshrFour != '' "> and remarkshrFour = #{remarkshrFour}</if>
+             <if test="endtime != null  and endtime != '' "> and endtime = #{endtime}</if>
+             <if test="clazztime != null  and clazztime != '' "> and clazztime = #{clazztime}</if>
+             <if test="clazzid != null  and clazzid != '' "> and clazzid = #{clazzid}</if>
+             <if test="stuid != null  and stuid != '' "> and stuid = #{stuid}</if>
+         </where>
+    </select>
+    
+    <select id="selectBaseInterviewById" parameterType="String" resultMap="BaseInterviewResult">
+        <include refid="selectBaseInterviewVo"/>
+        where interviewid = #{interviewid}
+    </select>
+        
+    <insert id="insertBaseInterview" parameterType="BaseInterview">
+        insert into tb_base_interview
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="interviewid != null  and interviewid != ''  ">interviewid,</if>
+			<if test="name != null  and name != ''  ">name,</if>
+			<if test="sex != null  and sex != ''  ">sex,</if>
+			<if test="age != null  and age != ''  ">age,</if>
+			<if test="education != null  and education != ''  ">education,</if>
+			<if test="problemOne != null  and problemOne != ''  ">problemOne,</if>
+			<if test="remarkshrOne != null  and remarkshrOne != ''  ">remarkshrOne,</if>
+			<if test="problemTow != null  and problemTow != ''  ">problemTow,</if>
+			<if test="remarkshrTow != null  and remarkshrTow != ''  ">remarkshrTow,</if>
+			<if test="problemThree != null  and problemThree != ''  ">problemThree,</if>
+			<if test="remarkshrThree != null  and remarkshrThree != ''  ">remarkshrThree,</if>
+			<if test="problemFour != null  and problemFour != ''  ">problemFour,</if>
+			<if test="remarkshrFour != null  and remarkshrFour != ''  ">remarkshrFour,</if>
+			<if test="endtime != null  and endtime != ''  ">endtime,</if>
+			<if test="clazztime != null  and clazztime != ''  ">clazztime,</if>
+			<if test="clazzid != null  and clazzid != ''  ">clazzid,</if>
+			<if test="stuid != null  and stuid != ''  ">stuid,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="interviewid != null  and interviewid != ''  ">#{interviewid},</if>
+			<if test="name != null  and name != ''  ">#{name},</if>
+			<if test="sex != null  and sex != ''  ">#{sex},</if>
+			<if test="age != null  and age != ''  ">#{age},</if>
+			<if test="education != null  and education != ''  ">#{education},</if>
+			<if test="problemOne != null  and problemOne != ''  ">#{problemOne},</if>
+			<if test="remarkshrOne != null  and remarkshrOne != ''  ">#{remarkshrOne},</if>
+			<if test="problemTow != null  and problemTow != ''  ">#{problemTow},</if>
+			<if test="remarkshrTow != null  and remarkshrTow != ''  ">#{remarkshrTow},</if>
+			<if test="problemThree != null  and problemThree != ''  ">#{problemThree},</if>
+			<if test="remarkshrThree != null  and remarkshrThree != ''  ">#{remarkshrThree},</if>
+			<if test="problemFour != null  and problemFour != ''  ">#{problemFour},</if>
+			<if test="remarkshrFour != null  and remarkshrFour != ''  ">#{remarkshrFour},</if>
+			<if test="endtime != null  and endtime != ''  ">#{endtime},</if>
+			<if test="clazztime != null  and clazztime != ''  ">#{clazztime},</if>
+			<if test="clazzid != null  and clazzid != ''  ">#{clazzid},</if>
+			<if test="stuid != null  and stuid != ''  ">#{stuid},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateBaseInterview" parameterType="BaseInterview">
+        update tb_base_interview
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''  ">name = #{name},</if>
+            <if test="sex != null  and sex != ''  ">sex = #{sex},</if>
+            <if test="age != null  and age != ''  ">age = #{age},</if>
+            <if test="education != null  and education != ''  ">education = #{education},</if>
+            <if test="problemOne != null  and problemOne != ''  ">problemOne = #{problemOne},</if>
+            <if test="remarkshrOne != null  and remarkshrOne != ''  ">remarkshrOne = #{remarkshrOne},</if>
+            <if test="problemTow != null  and problemTow != ''  ">problemTow = #{problemTow},</if>
+            <if test="remarkshrTow != null  and remarkshrTow != ''  ">remarkshrTow = #{remarkshrTow},</if>
+            <if test="problemThree != null  and problemThree != ''  ">problemThree = #{problemThree},</if>
+            <if test="remarkshrThree != null  and remarkshrThree != ''  ">remarkshrThree = #{remarkshrThree},</if>
+            <if test="problemFour != null  and problemFour != ''  ">problemFour = #{problemFour},</if>
+            <if test="remarkshrFour != null  and remarkshrFour != ''  ">remarkshrFour = #{remarkshrFour},</if>
+            <if test="endtime != null  and endtime != ''  ">endtime = #{endtime},</if>
+            <if test="clazztime != null  and clazztime != ''  ">clazztime = #{clazztime},</if>
+            <if test="clazzid != null  and clazzid != ''  ">clazzid = #{clazzid},</if>
+            <if test="stuid != null  and stuid != ''  ">stuid = #{stuid},</if>
+        </trim>
+        where interviewid = #{interviewid}
+    </update>
+
+	<delete id="deleteBaseInterviewById" parameterType="String">
+        delete from tb_base_interview where interviewid = #{interviewid}
+    </delete>
+
+    <delete id="deleteBaseInterviewByStuId" parameterType="String">
+        delete from tb_base_interview where stuid = #{stuid}
+    </delete>
+
+	
+    <delete id="deleteBaseInterviewByIds" parameterType="String">
+        delete from tb_base_interview where interviewid in 
+        <foreach item="interviewid" collection="array" open="(" separator="," close=")">
+            #{interviewid}
+        </foreach>
+    </delete>
+    
+</mapper>

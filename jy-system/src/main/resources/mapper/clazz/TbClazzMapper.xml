@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jy.system.mapper.TbClazzMapper">
+
+    <resultMap type="TbClazz" id="TbClazzResult">
+        <result property="clazzId" column="clazz_id"/>
+        <result property="clazzname" column="clazzname"/>
+        <result property="subjectId" column="subject_id"/>
+        <result property="subjectname" column="subjectname"/>
+        <result property="begintime" column="begintime"/>
+        <result property="endtime" column="endtime"/>
+        <result property="workday" column="workday"/>
+        <result property="workdaytime" column="workdaytime"/>
+        <result property="headmasterName" column="headmasterName"/>
+        <result property="isdelete" column="isdelete"/>
+        <result property="isvalid" column="isvalid"/>
+    </resultMap>
+
+    <sql id="selectTbClazzVo">
+        select clazz_id, clazzname, subject_id, subjectname, begintime, endtime, workday, workdaytime, headmasterName, isdelete, isvalid from tb_clazz
+    </sql>
+
+    <select id="selectTbClazzList" parameterType="TbClazz" resultMap="TbClazzResult">
+        <include refid="selectTbClazzVo"/>
+        <where>
+            <if test="clazzId != null  and clazzId != '' ">and clazz_id = #{clazzId}</if>
+            <if test="clazzname != null  and clazzname != '' ">and clazzname = #{clazzname}</if>
+            <if test="subjectId != null  and subjectId != '' ">and subject_id = #{subjectId}</if>
+            <if test="subjectname != null  and subjectname != '' ">and subjectname = #{subjectname}</if>
+            <if test="begintime != null  and begintime != '' ">and begintime = #{begintime}</if>
+            <if test="endtime != null  and endtime != '' ">and endtime = #{endtime}</if>
+            <if test="workday != null  and workday != '' ">and workday = #{workday}</if>
+            <if test="workdaytime != null  and workdaytime != '' ">and workdaytime = #{workdaytime}</if>
+            <if test="headmasterName != null  and headmasterName != '' ">and headmasterName = #{headmasterName}</if>
+            <if test="isdelete != null ">and isdelete = #{isdelete}</if>
+            <if test="isvalid != null ">and isvalid = #{isvalid}</if>
+        </where>
+    </select>
+    <!-- 查询班级 -->
+    <select id="selectTbClazzLists" resultType="com.jy.system.domain.vo.ClazzVO">
+        select if(getWorkDay(h.endtime) &lt; 0,0,getWorkDay(h.endtime)) workday,h.classSize,h.rateEmployment,if(CAST(h.salary AS SIGNED
+        INTEGER) <![CDATA[ <> ]]> 0,h.salary,0) salary,h.employment,h.subjectname,h.begintime,
+        h.endtime,h.clazzname,h.clazzId,h.subjectId,h.workdaytime,h.headmasterName from (
+        SELECT COUNT(*) AS classSize,FORMAT( CASE WHEN ts.Employment=1 OR COUNT(*) <![CDATA[ <> ]]> 0 THEN
+        SUM(ts.Employment)/COUNT(*) * 100 ELSE 0 END ,2)AS rateEmployment,
+        CAST((SUM( CASE WHEN ts.Salary>0 AND ts.Employment=1 THEN ts.Salary END )
+        /
+        SUM(CASE WHEN ts.Employment=1 THEN 1 END )) AS SIGNED INTEGER) AS salary,
+        SUM(CASE WHEN ts.Employment=0 THEN 1 END ) AS employment,
+        tc.subjectname,tc.begintime,tc.endtime,CAST(tc.clazzname AS SIGNED INTEGER) as clazzname,tc.clazz_id as
+        clazzId,tc.workday,tc.subject_id as subjectId,tc.workdaytime,ts.name,ts.emp_id,tc.headmasterName
+        FROM tb_clazz tc
+        LEFT JOIN tb_stu_clazz tsc ON tc.clazz_id=tsc.clazz_id
+        LEFT JOIN tb_studentinfo ts ON tsc.stu_id=ts.stu_id
+        where ts.name IS NOT NULL
+        <if test="empId!=null">
+            and ts.emp_id = #{empId}
+        </if>
+        group by clazzId) as h
+        where h.name IS NOT NULL
+        <if test="clazzId!=null">
+            and h.clazzId = #{clazzId}
+        </if>
+        <if test="subjectname!=null and subjectname!='' and subjectname!='all'">
+            AND h.subjectId = #{subjectname}
+        </if>
+        <if test="clazzname!=null and clazzname!=''">
+            AND h.clazzname LIKE CONCAT('%',#{clazzname},'%')
+        </if>
+        group by h.clazzId ORDER BY h.subjectname ASC,h.clazzname DESC
+    </select>
+
+    <select id="selectTbClazzById" parameterType="String" resultMap="TbClazzResult">
+        <include refid="selectTbClazzVo"/>
+        where clazz_id = #{clazzId}
+    </select>
+
+    <insert id="insertTbClazz" parameterType="TbClazz">
+        insert into tb_clazz
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="clazzId != null  and clazzId != ''  ">clazz_id,</if>
+            <if test="clazzname != null  and clazzname != ''  ">clazzname,</if>
+            <if test="subjectId != null  and subjectId != ''  ">subject_id,</if>
+            <if test="subjectname != null  and subjectname != ''  ">subjectname,</if>
+            <if test="begintime != null  and begintime != ''  ">begintime,</if>
+            <if test="endtime != null  and endtime != ''  ">endtime,</if>
+            <if test="workday != null  and workday != ''  ">workday,</if>
+            <if test="workdaytime != null  and workdaytime != ''  ">workdaytime,</if>
+            <if test="headmasterName != null  and headmasterName != ''  ">headmasterName,</if>
+            <if test="isdelete != null  ">isdelete,</if>
+            <if test="isvalid != null  ">isvalid,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="clazzId != null  and clazzId != ''  ">#{clazzId},</if>
+            <if test="clazzname != null  and clazzname != ''  ">#{clazzname},</if>
+            <if test="subjectId != null  and subjectId != ''  ">#{subjectId},</if>
+            <if test="subjectname != null  and subjectname != ''  ">#{subjectname},</if>
+            <if test="begintime != null  and begintime != ''  ">#{begintime},</if>
+            <if test="endtime != null  and endtime != ''  ">#{endtime},</if>
+            <if test="workday != null  and workday != ''  ">#{workday},</if>
+            <if test="workdaytime != null  and workdaytime != ''  ">#{workdaytime},</if>
+            <if test="headmasterName != null  and headmasterName != ''  ">#{headmasterName},</if>
+            <if test="isdelete != null  ">#{isdelete},</if>
+            <if test="isvalid != null  ">#{isvalid},</if>
+        </trim>
+    </insert>
+
+    <update id="updateTbClazz" parameterType="TbClazz">
+        update tb_clazz
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="clazzname != null  and clazzname != ''  ">clazzname = #{clazzname},</if>
+            <if test="subjectId != null  and subjectId != ''  ">subject_id = #{subjectId},</if>
+            <if test="subjectname != null  and subjectname != ''  ">subjectname = #{subjectname},</if>
+            <if test="begintime != null  and begintime != ''  ">begintime = #{begintime},</if>
+            <if test="endtime != null  and endtime != ''  ">endtime = #{endtime},</if>
+            <if test="workday != null  and workday != ''  ">workday = #{workday},</if>
+            <if test="workdaytime != null  and workdaytime != ''  ">workdaytime = #{workdaytime},</if>
+            <if test="headmasterName != null  and headmasterName != ''  ">headmasterName = #{headmasterName},</if>
+            <if test="isdelete != null  ">isdelete = #{isdelete},</if>
+            <if test="isvalid != null  ">isvalid = #{isvalid},</if>
+        </trim>
+        where clazz_id = #{clazzId}
+    </update>
+
+    <delete id="deleteTbClazzById" parameterType="String">
+        delete from tb_clazz where clazz_id = #{clazzId}
+    </delete>
+
+    <delete id="deleteTbClazzByIds" parameterType="String">
+        delete from tb_clazz where clazz_id in
+        <foreach item="clazzId" collection="array" open="(" separator="," close=")">
+            #{clazzId}
+        </foreach>
+    </delete>
+
+    <!--删除学员信息-->
+    <delete id="deleteTbStudentinfoAll" parameterType="String">
+        DELETE FROM tb_studentinfo WHERE stu_id IN (
+        SELECT a.stu_id FROM (
+        SELECT stu_id FROM tb_stu_clazz WHERE clazz_id = #{clazzId}
+        )a)
+    </delete>
+
+    <!-- 删除班级学员关联信息 -->
+    <delete id="delByClazzAndStu" parameterType="java.lang.String">
+        DELETE FROM tb_stu_clazz WHERE stu_id IN (
+        SELECT a.stu_id FROM (
+        SELECT stu_id FROM tb_stu_clazz WHERE clazz_id = #{clazzId}
+        )a)
+    </delete>
+</mapper>

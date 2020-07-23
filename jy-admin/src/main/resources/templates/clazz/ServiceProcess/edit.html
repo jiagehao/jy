@@ -1,0 +1,63 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<th:block th:include="include :: header('修改过程服务班级')" />
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-baseClazz-edit" th:object="${ServiceProcessVO}">
+            <input id="clazzId" name="clazzId" th:field="*{clazzid}"  type="hidden">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">学科名称：</label>
+				<div class="col-sm-8">
+					<input id="subjectname" th:field="*{subjectname}"   class="form-control " readonly="readonly" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">班级名称：</label>
+				<div class="col-sm-8">
+					<input id="clazzname" th:field="*{clazzname}"   class="form-control " readonly="readonly" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">就业老师名称：</label>
+				<div class="col-sm-8">
+					<input id="empname" th:field="*{empname}"  class="form-control " readonly="readonly" type="text">
+					<!--<select name="empname" class="form-control" th:field="*{empname}">-->
+						<!--<option value="">请选择</option>-->
+						<!--<option th:each="supplier : ${emp}"-->
+								<!--th:value="${supplier.userId}" th:text="${supplier.userName}"></option>-->
+					<!--</select>-->
+				</div>
+
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">开班时间：</label>
+				<div class="col-sm-8">
+					<input id="Estimate" name="Estimate" th:field="*{Estimate}" readonly="readonly" placeholder="开班时间" class="form-control time-input" type="text">
+				</div>
+			</div>
+
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "ServiceProcess";
+		$("#form-baseClazz-edit").validate({
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			}
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/edit", $('#form-baseClazz-edit').serialize());
+	        }
+	    }
+
+
+
+	</script>
+</body>
+</html>

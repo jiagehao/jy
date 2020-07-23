@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jy.system.mapper.TbJyDataMapper">
+    
+    <resultMap type="TbJyData" id="TbJyDataResult">
+        <result property="id"    column="id"    />
+        <result property="className"    column="className"    />
+        <result property="userNum"    column="userNum"    />
+        <result property="a"    column="a"    />
+        <result property="b"    column="b"    />
+        <result property="c"    column="c"    />
+        <result property="d"    column="d"    />
+        <result property="e"    column="e"    />
+        <result property="f"    column="f"    />
+        <result property="g"    column="g"    />
+        <result property="o2"    column="o2"    />
+        <result property="p2"    column="p2"    />
+        <result property="q2"    column="q2"    />
+        <result property="r2"    column="r2"    />
+        <result property="s2"    column="s2"    />
+        <result property="t2"    column="t2"    />
+        <result property="u2"    column="u2"    />
+        <result property="o4"    column="o4"    />
+        <result property="p4"    column="p4"    />
+        <result property="q4"    column="q4"    />
+        <result property="r4"    column="r4"    />
+        <result property="s4"    column="s4"    />
+        <result property="t4"    column="t4"    />
+        <result property="u4"    column="u4"    />
+        <result property="o6"    column="o6"    />
+        <result property="p6"    column="p6"    />
+        <result property="q6"    column="q6"    />
+        <result property="r6"    column="r6"    />
+        <result property="s6"    column="s6"    />
+        <result property="t6"    column="t6"    />
+        <result property="u6"    column="u6"    />
+    </resultMap>
+	
+	<sql id="selectTbJyDataVo">
+        select id,className,userNum, a, b, c, d, e, f, g, o2, p2, q2, r2, s2, t2, u2, o4, p4, q4, r4, s4, t4, u4, o6, p6, q6, r6, s6, t6, u6 from tb_jy_data
+    </sql>
+	
+    <select id="selectTbJyDataList" parameterType="TbJyData" resultMap="TbJyDataResult">
+        <include refid="selectTbJyDataVo"/>
+        <where>  
+            <if test="id != null  and id != '' "> and id = #{id}</if>
+             <if test="a != null  and a != '' "> and a = #{a}</if>
+             <if test="a != null  and a != '' "> and a = #{a}</if>
+             <if test="b != null  and b != '' "> and b = #{b}</if>
+             <if test="c != null  and c != '' "> and c = #{c}</if>
+             <if test="d != null  and d != '' "> and d = #{d}</if>
+             <if test="e != null  and e != '' "> and e = #{e}</if>
+             <if test="f != null  and f != '' "> and f = #{f}</if>
+             <if test="g != null  and g != '' "> and g = #{g}</if>
+             <if test="o2 != null  and o2 != '' "> and o2 = #{o2}</if>
+             <if test="p2 != null  and p2 != '' "> and p2 = #{p2}</if>
+             <if test="q2 != null  and q2 != '' "> and q2 = #{q2}</if>
+             <if test="r2 != null  and r2 != '' "> and r2 = #{r2}</if>
+             <if test="s2 != null  and s2 != '' "> and s2 = #{s2}</if>
+             <if test="t2 != null  and t2 != '' "> and t2 = #{t2}</if>
+             <if test="u2 != null  and u2 != '' "> and u2 = #{u2}</if>
+             <if test="o4 != null  and o4 != '' "> and o4 = #{o4}</if>
+             <if test="p4 != null  and p4 != '' "> and p4 = #{p4}</if>
+             <if test="q4 != null  and q4 != '' "> and q4 = #{q4}</if>
+             <if test="r4 != null  and r4 != '' "> and r4 = #{r4}</if>
+             <if test="s4 != null  and s4 != '' "> and s4 = #{s4}</if>
+             <if test="t4 != null  and t4 != '' "> and t4 = #{t4}</if>
+             <if test="u4 != null  and u4 != '' "> and u4 = #{u4}</if>
+             <if test="o6 != null  and o6 != '' "> and o6 = #{o6}</if>
+             <if test="p6 != null  and p6 != '' "> and p6 = #{p6}</if>
+             <if test="q6 != null  and q6 != '' "> and q6 = #{q6}</if>
+             <if test="r6 != null  and r6 != '' "> and r6 = #{r6}</if>
+             <if test="s6 != null  and s6 != '' "> and s6 = #{s6}</if>
+             <if test="t6 != null  and t6 != '' "> and t6 = #{t6}</if>
+             <if test="u6 != null  and u6 != '' "> and u6 = #{u6}</if>
+         </where>
+        ORDER BY d asc, className desc
+    </select>
+
+    <select id="selectAVG" parameterType="String" resultType="JyDataVo">
+        SELECT
+            ifnull(getArrayList ( CONCAT(#{days}, '-01'), d ),0) a,
+            ifnull(getArrayList ( CONCAT(#{days}, '-02'), d ),0) b,
+            ifnull(getArrayList ( CONCAT(#{days}, '-03'), d ),0) c,
+            ifnull(getArrayList ( CONCAT(#{days}, '-04'), d ),0) d,
+            ifnull(getArrayList ( CONCAT(#{days}, '-05'), d ),0) e,
+            ifnull(getArrayList ( CONCAT(#{days}, '-06'), d ),0) f,
+            ifnull(getArrayList ( CONCAT(#{days}, '-07'), d ),0) g,
+            ifnull(getArrayList ( CONCAT(#{days}, '-08'), d ),0) h,
+            ifnull(getArrayList ( CONCAT(#{days}, '-09'), d ),0) i,
+            ifnull(getArrayList ( CONCAT(#{days}, '-10'), d ),0) j,
+            ifnull(getArrayList ( CONCAT(#{days}, '-11'), d ),0) k,
+            ifnull(getArrayList ( CONCAT(#{days}, '-12'), d ),0) l,
+            d as userName
+        FROM
+            tb_jy_data
+        GROUP BY
+            d
+
+    </select>
+
+    <select id="selectTbJyDataById" parameterType="String" resultMap="TbJyDataResult">
+        <include refid="selectTbJyDataVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertTbJyData" parameterType="TbJyData">
+        insert into tb_jy_data
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">id,</if>
+			<if test="className != null  and className != ''  ">className,</if>
+			<if test="userNum != null  and userNum != ''  ">userNum,</if>
+			<if test="a != null  and a != ''  ">a,</if>
+			<if test="b != null  and b != ''  ">b,</if>
+			<if test="c != null  and c != ''  ">c,</if>
+			<if test="d != null  and d != ''  ">d,</if>
+			<if test="e != null  and e != ''  ">e,</if>
+			<if test="f != null  and f != ''  ">f,</if>
+			<if test="g != null  and g != ''  ">g,</if>
+			<if test="o2 != null  and o2 != ''  ">o2,</if>
+			<if test="p2 != null  and p2 != ''  ">p2,</if>
+			<if test="q2 != null  and q2 != ''  ">q2,</if>
+			<if test="r2 != null  and r2 != ''  ">r2,</if>
+			<if test="s2 != null  and s2 != ''  ">s2,</if>
+			<if test="t2 != null  and t2 != ''  ">t2,</if>
+			<if test="u2 != null  and u2 != ''  ">u2,</if>
+			<if test="o4 != null  and o4 != ''  ">o4,</if>
+			<if test="p4 != null  and p4 != ''  ">p4,</if>
+			<if test="q4 != null  and q4 != ''  ">q4,</if>
+			<if test="r4 != null  and r4 != ''  ">r4,</if>
+			<if test="s4 != null  and s4 != ''  ">s4,</if>
+			<if test="t4 != null  and t4 != ''  ">t4,</if>
+			<if test="u4 != null  and u4 != ''  ">u4,</if>
+			<if test="o6 != null  and o6 != ''  ">o6,</if>
+			<if test="p6 != null  and p6 != ''  ">p6,</if>
+			<if test="q6 != null  and q6 != ''  ">q6,</if>
+			<if test="r6 != null  and r6 != ''  ">r6,</if>
+			<if test="s6 != null  and s6 != ''  ">s6,</if>
+			<if test="t6 != null  and t6 != ''  ">t6,</if>
+			<if test="u6 != null  and u6 != ''  ">u6,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">#{id},</if>
+			<if test="className != null  and className != ''  ">#{className},</if>
+			<if test="userNum != null  and userNum != ''  ">#{userNum},</if>
+			<if test="a != null  and a != ''  ">#{a},</if>
+			<if test="b != null  and b != ''  ">#{b},</if>
+			<if test="c != null  and c != ''  ">#{c},</if>
+			<if test="d != null  and d != ''  ">#{d},</if>
+			<if test="e != null  and e != ''  ">#{e},</if>
+			<if test="f != null  and f != ''  ">#{f},</if>
+			<if test="g != null  and g != ''  ">#{g},</if>
+			<if test="o2 != null  and o2 != ''  ">#{o2},</if>
+			<if test="p2 != null  and p2 != ''  ">#{p2},</if>
+			<if test="q2 != null  and q2 != ''  ">#{q2},</if>
+			<if test="r2 != null  and r2 != ''  ">#{r2},</if>
+			<if test="s2 != null  and s2 != ''  ">#{s2},</if>
+			<if test="t2 != null  and t2 != ''  ">#{t2},</if>
+			<if test="u2 != null  and u2 != ''  ">#{u2},</if>
+			<if test="o4 != null  and o4 != ''  ">#{o4},</if>
+			<if test="p4 != null  and p4 != ''  ">#{p4},</if>
+			<if test="q4 != null  and q4 != ''  ">#{q4},</if>
+			<if test="r4 != null  and r4 != ''  ">#{r4},</if>
+			<if test="s4 != null  and s4 != ''  ">#{s4},</if>
+			<if test="t4 != null  and t4 != ''  ">#{t4},</if>
+			<if test="u4 != null  and u4 != ''  ">#{u4},</if>
+			<if test="o6 != null  and o6 != ''  ">#{o6},</if>
+			<if test="p6 != null  and p6 != ''  ">#{p6},</if>
+			<if test="q6 != null  and q6 != ''  ">#{q6},</if>
+			<if test="r6 != null  and r6 != ''  ">#{r6},</if>
+			<if test="s6 != null  and s6 != ''  ">#{s6},</if>
+			<if test="t6 != null  and t6 != ''  ">#{t6},</if>
+			<if test="u6 != null  and u6 != ''  ">#{u6},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbJyData" parameterType="TbJyData">
+        update tb_jy_data
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="a != null  and a != ''  ">a = #{a},</if>
+            <if test="className != null  and className != ''  ">className = #{className},</if>
+            <if test="userNum != null  and userNum != ''  ">userNum = #{userNum},</if>
+            <if test="b != null  and b != ''  ">b = #{b},</if>
+            <if test="c != null  and c != ''  ">c = #{c},</if>
+            <if test="d != null  and d != ''  ">d = #{d},</if>
+            <if test="e != null  and e != ''  ">e = #{e},</if>
+            <if test="f != null  and f != ''  ">f = #{f},</if>
+            <if test="g != null  and g != ''  ">g = #{g},</if>
+            <if test="o2 != null  and o2 != ''  ">o2 = #{o2},</if>
+            <if test="p2 != null  and p2 != ''  ">p2 = #{p2},</if>
+            <if test="q2 != null  and q2 != ''  ">q2 = #{q2},</if>
+            <if test="r2 != null  and r2 != ''  ">r2 = #{r2},</if>
+            <if test="s2 != null  and s2 != ''  ">s2 = #{s2},</if>
+            <if test="t2 != null  and t2 != ''  ">t2 = #{t2},</if>
+            <if test="u2 != null  and u2 != ''  ">u2 = #{u2},</if>
+            <if test="o4 != null  and o4 != ''  ">o4 = #{o4},</if>
+            <if test="p4 != null  and p4 != ''  ">p4 = #{p4},</if>
+            <if test="q4 != null  and q4 != ''  ">q4 = #{q4},</if>
+            <if test="r4 != null  and r4 != ''  ">r4 = #{r4},</if>
+            <if test="s4 != null  and s4 != ''  ">s4 = #{s4},</if>
+            <if test="t4 != null  and t4 != ''  ">t4 = #{t4},</if>
+            <if test="u4 != null  and u4 != ''  ">u4 = #{u4},</if>
+            <if test="o6 != null  and o6 != ''  ">o6 = #{o6},</if>
+            <if test="p6 != null  and p6 != ''  ">p6 = #{p6},</if>
+            <if test="q6 != null  and q6 != ''  ">q6 = #{q6},</if>
+            <if test="r6 != null  and r6 != ''  ">r6 = #{r6},</if>
+            <if test="s6 != null  and s6 != ''  ">s6 = #{s6},</if>
+            <if test="t6 != null  and t6 != ''  ">t6 = #{t6},</if>
+            <if test="u6 != null  and u6 != ''  ">u6 = #{u6},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteTbJyDataById" parameterType="String">
+        delete from tb_jy_data where id = #{id}
+    </delete>
+	
+    <delete id="deleteTbJyDataByIds" parameterType="String">
+        delete from tb_jy_data where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

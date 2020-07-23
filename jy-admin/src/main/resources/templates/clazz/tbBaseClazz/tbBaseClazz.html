@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('班级列表')"/>
+
+</head>
+<body class="gray-bg">
+
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            学科名称：
+                            <select name="subjectId" id="subject"></select>
+                        </li>
+
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-info" onclick="$.table.importExcel('','',0)" shiro:hasPermission="clazz:baseClazz:importExcel">
+                <i class="fa fa-upload"></i> 添加班级
+            </a>
+            <!--<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="clazz:tbBasicClazz:edit">-->
+            <!--<i class="fa fa-edit"></i> 修改-->
+            <!--</a>-->
+            <!--<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="clazz:tbBasicClazz:remove">-->
+            <!--<i class="fa fa-remove"></i> 删除-->
+            <!--</a>-->
+            <!--<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="clazz:tbBasicClazz:export">-->
+            <!--<i class="fa fa-download"></i> 导出-->
+            <!--</a>-->
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table class="table table-bordered" id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<form id="importForm" enctype="multipart/form-data" class="form-horizontal fromtest m " style="display: none;">
+    <div class="col-xs-offset-1">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">班级期数：</label>
+            <div class="col-sm-8">
+                <input id="clazzName" name="clazzName"  class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">学科名称：</label>
+            <div class="col-sm-8">
+                <select name="subjectname" id="subjectID" class=" form-control ">
+
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">基础班开班时间：</label>
+            <div class="col-sm-8">
+                <input id="begintime" name="begintime" readonly="readonly" placeholder="基础班开班时间" class="form-control layui-input" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">基础班毕业时间：</label>
+            <div class="col-sm-8">
+                <input id="endtime" name="endtime" readonly="readonly" placeholder="基础班毕业时间" class="form-control layui-input" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">班主任名称：</label>
+            <div class="col-sm-8">
+                <input id="headmasterName" name="headmasterName"  class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">助教姓名：</label>
+            <div class="col-sm-8">
+                <input id="assistantname" name="assistantname"  class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">讲师姓名：</label>
+            <div class="col-sm-8">
+                <input id="lecturername" name="lecturername"  class="form-control" type="text">
+            </div>
+        </div>
+        <input type="file" id="file" name="file"/>
+        <font color="red" class="pull-left mt10">
+            提示：仅允许导入“xls”或“xlsx”格式文件！
+        </font>
+    </div>
+</form>
+<div id="d" style="display:none;">
+    <input type="text" name=""><br>
+    <input type="text" name="">
+    <input type="submit" value="提交">
+</div>
+<div th:include="include :: footer"></div>
+<script th:inline="javascript">
+    var editFlag = [[${@permission.hasPermi('clazz:tbBaseClazz:edit')}]];
+    var view = [[${@permission.hasPermi('clazz:tbBaseStudentinfo:view')}]];
+    var removeFlag = [[${@permission.hasPermi('clazz:tbBaseClazz:remove')}]];
+    var interview = [[${@permission.hasPermi('clazz:tbBaseInterview:view')}]];
+    var prefix = ctx + "clazz/tbBaseClazz";
+    $(function () {
+        new OptionUtils("subjectID", "/clazz/tbSubject/TbSubjectList", "subjectId", "subjectName");
+        new OptionUtils("subject", "/clazz/tbSubject/TbSubjectList", "subjectId", "subjectName");
+    });
+
+        $("#subject").change(function(){$.table.search()});
+        var options = {
+            url: prefix + "/list",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/export",
+            importUrl: prefix + "/importExcel",
+            modalName: "班级",
+            showExport: false,
+            footerFormatter: footerFormatter,
+            pageSize: 150,
+
+            search:false,
+            showSearch:false,//搜索关闭
+            showToggle:false,//切换视图关闭
+
+            columns: [{
+                title: "序号",
+                formatter: function (value, row, index) {
+                    return $.table.serialNumber(index);
+                },
+                width: 5,
+                valign: 'middle',
+                align: 'center',
+                halign: 'center',
+                falign: 'center'
+            },
+                {
+                    field: 'subjectname',
+                    title: '学科',
+                    visible: true,
+                    valign: 'middle',
+                    align: 'center',
+                    halign: 'center',
+                    falign: 'center'
+                },
+                {
+                    field: 'clazzname',
+                    title: '班级',
+                    sortable: true,
+                    valign: 'middle',
+                    align: 'center',
+                    halign: 'center',
+                    falign: 'center'
+                },
+                {
+                    field: 'begintime',
+                    title: '开班时间',
+                    sortable: true,
+                    valign: 'middle',
+                    align: 'center',
+                    halign: 'center',
+                    falign: 'center'
+                },
+                {
+                    field: 'endtime',
+                    title: '毕业时间',
+                    sortable: true,
+                    valign: 'middle',
+                    align: 'center',
+                    halign: 'center',
+                    falign: 'center',
+//                    cellStyle: cellStylesales,
+
+                },
+                {
+                    field: 'classSize',
+                    title: '班级人数',
+                    sortable: true,
+                    valign: 'middle',
+                    align: 'center',
+                    halign: 'center',
+                    falign: 'center'
+                },
+                {
+                    field: 'brand',
+                    title: '流失人数',
+                    sortable: true,
+                    valign: 'middle',
+                    align: 'center',
+                    halign: 'center',
+                    falign: 'center'
+                },
+                {
+                    field: 'rateEmployment',
+                    title: '流失率',
+                    sortable: true,
+                    valign: 'middle',
+                    align: 'center',
+                    halign: 'center',
+                    falign: 'center'
+                },
+                {
+                    field: 'workday',
+                    title: '倒计时',
+                    sortable: true,
+                    valign: 'middle',
+                    align: 'center',
+                    halign: 'center',
+                    falign: 'center'
+                },
+                {
+                    field: 'assistantname',
+                    title: '助教',
+                    sortable: true,
+                    valign: 'middle',
+                    align: 'center',
+                    halign: 'center',
+                    falign: 'center'
+                },
+                {
+                    field: 'headmasterName',
+                    title: '班主任',
+                    sortable: true,
+                    valign: 'middle',
+                    align: 'center',
+                    halign: 'center',
+                    falign: 'center'
+                },
+                {
+                    field: 'lecturername',
+                    title: '讲师',
+                    sortable: true,
+                    valign: 'middle',
+                    align: 'center',
+                    halign: 'center',
+                    falign: 'center'
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        var url = '/clazz/tbBaseStudentinfo';
+                        var urls = '/clazz/tbBaseInterview';
+                        actions.push('<a class="btn btn-success btn-xs ' + view + '" href="javascript:;" onclick="$.operate.openJoin(\'' + url + '?clazzId=' + row.clazzId + '&subjectId='+ row.subjectId+'\',\'' + row.subjectname+'&nbsp;&nbsp;&nbsp;&nbsp;'+row.clazzname+'基础班信息'+'\')"><i class="fa fa-edit"></i>进入</a> ');
+                        actions.push('<a class="btn btn-success btn-xs ' + interview + '" href="javascript:;" onclick="$.operate.join(\'' + urls + '?clazzId=' + row.clazzId+'&subjectName='+row.subjectname+'&clazzName='+row.clazzname+'\')"><i class="fa fa-edit"></i>访谈</a> ');
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:;" onclick="$.operate.edit(\'' + row.clazzId + '\')"><i class="fa fa-edit"></i>编辑</a> ');//row.subjectname+clazzname+'基础班信息'
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:;" onclick="$.operate.remove(\'' + row.clazzId + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    },
+                    valign: 'middle',
+                    align: 'center',
+                    halign: 'center',
+                    falign: 'center'
+                }]
+        };
+        $.table.init(options);
+
+
+    function cellStylesales(value, row, index) {
+        return {css: {"background": '#F0E68C'}};
+    }
+
+    function footerFormatter(data) {
+    }
+    layui.use('laydate', function() {
+        var laydate = layui.laydate;
+        //常规用法
+        laydate.render({
+            elem: '#begintime'
+        });
+
+        //常规用法
+        laydate.render({
+            elem: '#endtime'
+        });
+    });
+
+
+</script>
+</body>
+</html>

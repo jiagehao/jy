@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('班级列表')" />
+	<!--<link th:href="@{/ajax/libs/cropbox/cropbox.css}" rel="stylesheet"/>-->
+
+	<meta charset="utf-8">
+</head>
+<body class="gray-bg" th:object="${sysUser}">
+<!--<input id="subjectIds"  type="hidden"  th:field="*{subjectId}" />-->
+<!--<input id="userName"  type="hidden"  th:field="*{userName}" />-->
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<div  style="margin-left: 15px; margin-right: 5px;font-weight:bold" id="subjectName">
+
+				</div>
+
+			</div>
+
+	        <div class="btn-group-sm" id="toolbar" role="group">
+				<div  style="margin-left: 15px; margin-right: 5px;font-weight:bold" id="headCategoryName">
+
+				</div>
+				<div  style="margin-left: 15px; margin-right: 5px;font-weight:bold" id="headmasterName">
+
+				</div>
+				<!--<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="clazz:tbClazz:add">-->
+					<!--<i class="fa fa-plus"></i> 添加-->
+				<!--</a>-->
+				<!--<a class="btn btn-info" onclick="$.table.importExcel('','',1)" shiro:hasPermission="clazz:tbClazz:importExcel">-->
+					<!--<i class="fa fa-upload"></i> 添加班级-->
+				<!--</a>-->
+				<!--<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="clazz:tbClazz:edit">-->
+					<!--<i class="fa fa-edit"></i> 修改-->
+				<!--</a>-->
+				<!--<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="clazz:tbClazz:remove">-->
+					<!--<i class="fa fa-remove"></i> 删除-->
+				<!--</a>-->
+				<!--<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="clazz:tbClazz:export">-->
+						<!--<i class="fa fa-download"></i> 导出-->
+				 <!--</a>-->
+			</div>
+			<div class="col-sm-12 select-table table-striped">
+				<table class="table table-bordered" id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('clazz:tbClazz:edit')}]];
+        var trackListFlag = [[${@permission.hasPermi('clazz:tbStudentinfo:trackList')}]];
+        var addTrackFlag = [[${@permission.hasPermi('clazz:tbStudentinfo:addTrack')}]];
+        var view = [[${@permission.hasPermi('clazz:tbStudentinfo:view')}]];
+        var removeFlag = [[${@permission.hasPermi('clazz:tbClazz:remove')}]];
+		$(function(){
+            new OptionUtils("subjectID","/clazz/tbSubject/TbSubjectList","subjectId","subjectName");
+            new OptionUtils("subject","/clazz/tbSubject/TbSubjectList","subjectId","subjectName");
+        })
+        //获取地址栏中的值
+        function getUrlParam(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+            var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+            if (r != null) return decodeURI(r[2]); return null; //返回参数值
+        }
+        var clazzid = getUrlParam('clazzid');
+        var subjectName = getUrlParam('subjectName');
+        $('#importForm').append('<input type="hidden" value="'+clazzid+'" id="clazzId" name="clazzId">')
+        $('#subjectName').append('<h2 style="text-align:center">'+subjectName+'</h2>')
+        $(function(){
+        var prefix = ctx + "ServiceProcess";
+            var options = {
+                url: prefix + "/getServerStu?clazzid="+clazzid,
+                createUrl: prefix + "/add",
+                editUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                //详情学生详细记录
+                infoUrl: prefix + "/info/{stuId}",
+				//违纪记录
+                //添加学生详细记录
+                addInfoUrl: prefix + "/addInfo/{stuId}/{isfoul}",
+                modalName: "过程服务学员",
+		        showExport: false,
+                search:false,
+                showSearch:false,//搜索关闭
+                showToggle:false,//切换视图关闭
+//                rowStyle:rowStyle,
+                onClickCell:onClickCell,
+                clickToSelect: true,				// 是否启用点击选中行
+                onLoadSuccess:onLoadSuccess,
+                pageSize:150,
+                columns: [{
+                    title: "序号",
+                    formatter: function (value, row, index) {
+                        return $.table.serialNumber(index);
+
+                    },
+                    width:5,
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center'
+		        },
+				{
+					field : 'name',
+					title : '姓名',
+					visible: true,
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center',
+				},
+				{
+					field : 'sex',
+					title : '性别',
+					sortable: true,
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center'
+				},
+				{
+					field : 'education',
+					title : '学历',
+					sortable: true,
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center',
+//                    formatter: function(value, row, index) {
+//
+//                    }
+				},
+				{
+					field : 'category',
+					title : '评价',
+					sortable: true,
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center',
+                    editable: {
+                        type: "select",
+						source: [
+							 { value: '0', text: 'A类' },
+                            { value: '1', text: 'B类' },
+                            { value: '2', text: 'C类' },
+                            { value: '3', text: 'D类' },
+                            ],
+                    },
+				},
+					{
+					field : 'violationOfDiscipline',
+					title : '违纪次数',
+					sortable: true,
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center',
+//                    formatter: function(value, row, index) {
+//
+//                    }
+				},
+                    {
+                        field : 'description',
+                        title : '记录时间',
+                        valign:'middle',
+                        align:'center',
+                        halign:'center',
+                        width:30,
+                        falign:'center',
+                        formatter: function(value, row, index) {
+                            console.log(row)
+                            var val = value.split('Ω')
+                            var v= val[1]==undefined?'':val[1]
+                            var myDate = new Date();
+                            var dat;
+                            var year=myDate.getFullYear();        //获取当前年
+                            var month=myDate.getMonth()+1;   //获取当前月
+                            var date=myDate.getDate();            //获取当前日
+                            dat=year+"-"+month+"-"+date;
+                            var days = daysBetween(v,dat)
+                                if(isNaN(days)){
+                                    return '<p href="javascript:;" data-toggle="tooltip"></p>'
+                                }else if(days>=5){
+                                    return '<p href="javascript:;" data-toggle="tooltip" style="color:red" >'+days+'天</p>'
+                                }else{
+                                    return '<p href="javascript:;" data-toggle="tooltip">'+days+'天</p>'
+                                }
+                        }
+                 },
+				{
+					field : 'description',
+					title : '备注',
+					sortable: true,
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center',
+                    formatter: function(value, row, index) {
+                        var val = value.split('Ω')
+                        var v= val[1]==undefined?'':val[1]
+                        var myDate = new Date();
+                        var dat;
+                        var year=myDate.getFullYear();        //获取当前年
+                        var month=myDate.getMonth()+1;   //获取当前月
+                        var date=myDate.getDate();            //获取当前日
+                        dat=year+"-"+month+"-"+date;
+                        var days = daysBetween(v,dat)
+                        console.log(days)
+                        if(isNaN(days)){
+                            return '<p href="javascript:;" data-toggle="tooltip"></p>'
+                        }else if(days>=5){
+                            return '<p href="javascript:;" data-toggle="tooltip" style="color:red" >'+val[0]+'</p>'
+                        }else{
+                            return '<p href="javascript:;" data-toggle="tooltip">'+val[0]+'</p>'
+                        }
+                    }
+				},
+				{
+                    field : 'empname',
+                    title : '就业指导',
+					sortable: true,
+					valign:'middle',
+					align:'center',
+					halign:'center',
+					falign:'center',
+
+                    },
+		        {
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + trackListFlag + '" href="javascript:;" onclick="$.operate.openStudentInfo(\'' + row.stuid +'\')"><i class="fa fa-comments-o"></i>查询记录</a> ');
+                        actions.push('<a class="btn btn-success btn-xs ' + addTrackFlag + '" href="javascript:;" onclick="$.operate.addServerInfo(\'' + row.stuid +'\',\''+'0'+'\')"><i class="fa fa-commenting"></i>添加记录</a><br /> ');
+                        actions.push('<a class="btn btn-success btn-xs ' + addTrackFlag + '" href="javascript:;" onclick="$.operate.addServerInfo(\'' + row.stuid +'\',\''+'1'+'\')"><i class="fa fa-commenting"></i>添加违纪</a><br /> ');
+//                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:;" onclick="$.operate.edit(\'' + row.stuid + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+//                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:;" onclick="$.operate.remove(\'' + row.stuid + '\')"><i class="fa fa-remove"></i>删除</a>');
+						return actions.join('');
+		            },
+                    valign:'middle',
+                    align:'center',
+                    halign:'center',
+                    falign:'center'
+		        }],
+                onEditableSave: function (field, row, oldValue, $el) {//提交行内编辑数据
+                    if('category' == field){
+                        var prefix = ctx + "clazz/tbBaseStudentinfo";
+                        $.operate.saveLayer(prefix + "/edit", {"stuId":row.stuid,"category":row.category});
+                    }
+                }
+                };
+            $.table.init(options)
+        })
+        function onLoadSuccess(row,index){
+            $('#headmasterName').empty()
+            $('#headCategoryName').empty()
+            var b=0,d=0,g=0,y=0,a_c=0,b_c=0,c_c=0,d_c=0;
+            var arr = ['本科','大专','研究生','其他']
+            var arrc = ['A类','B类','C类','D类']
+
+            var rows=row.rows;
+			for(var i=0;i<rows.length;i++){
+                if(rows[i].education=="本科"){
+					b++;
+                }else if(rows[i].education=="大专"){
+                    d++;
+                }else if(rows[i].education=="研究生"){
+                    y++;
+                } else{
+                    g++;
+                }
+                //学生分类ABCD
+				if(rows[i].category=='0'){
+                    a_c++;
+				}else if(rows[i].category=='1'){
+                    b_c++;
+                }else if(rows[i].category=='2'){
+                    c_c++;
+                }else if(rows[i].category=='3'){
+                    d_c++;
+                }
+
+			}
+
+			for(var o=0;o<arr.length;o++){
+
+                var srt =  ''
+                var srtc =  ''
+                switch (o){
+                    case 0:
+                        srt +='<div class="btn bg-danger" style="font-size: 12px"><i class="fa"></i>'+arr[o]+'    占比：'+(b/rows.length*100).toFixed(2)+'%共：'+b+'人</div>'
+                        srtc +='<div class="btn bg-success" style="font-size: 12px"><i class="fa"></i>'+arrc[o]+'    占比：'+(a_c/rows.length*100).toFixed(2)+'%共：'+a_c+'人</div>'
+                        break
+                    case 1:
+                        srt +='<div class="btn bg-info" style="font-size: 12px"><i class="fa"></i>'+arr[o]+'    占比：'+(d/rows.length*100).toFixed(2)+'%共：'+d+'人</div>'
+                        srtc +='<div class="btn bg-info" style="font-size: 12px"><i class="fa"></i>'+arrc[o]+'    占比：'+(b_c/rows.length*100).toFixed(2)+'%共：'+b_c+'人</div>'
+                        break
+                    case 2:
+                        srt +='<div class="btn bg-warning" style="font-size: 12px"><i class="fa"></i>'+arr[o]+'    占比：'+(y/rows.length*100).toFixed(2)+'%共：'+y+'人</div>'
+                        srtc +='<div class="btn bg-warning" style="font-size: 12px"><i class="fa"></i>'+arrc[o]+'    占比：'+(c_c/rows.length*100).toFixed(2)+'%共：'+c_c+'人</div>'
+                        break
+                    case 3:
+                        srt +='<div class="btn bg-success" style="font-size: 12px"><i class="fa"></i>'+arr[o]+'    占比：'+(g/rows.length*100).toFixed(2)+'%共：'+g+'人</div>'
+                        srtc +='<div class="btn bg-danger" style="font-size: 12px"><i class="fa"></i>'+arrc[o]+'    占比：'+(d_c/rows.length*100).toFixed(2)+'%共：'+d_c+'人</div>'
+                        break
+                }
+                $('#headmasterName').append(srt)
+                $('#headCategoryName').append(srtc)
+			}
+
+            $('[data-toggle="tooltip"]').tooltip();
+        }
+		function onClickCell(field, value, row, $element){
+            if('category' == field){
+                // var prefix = ctx + "clazz/tbBaseStudentinfo";
+                // $.operate.save(prefix + "/edit", {"stuId":row.stuid,"category":value});
+                // console.log(field)
+                // console.log(value)
+                // console.log(row)
+                // console.log($element)
+			}
+
+		}
+
+
+
+
+
+	</script>
+</body>
+
+
+</html>

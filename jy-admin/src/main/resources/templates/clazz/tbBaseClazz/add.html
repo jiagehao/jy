@@ -1,0 +1,127 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<th:block th:include="include :: header('新增基础班班级')" />
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-baseClazz-add">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">班级名称：</label>
+				<div class="col-sm-8">
+					<input id="clazzname" name="clazzname" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">班级人数：</label>
+				<div class="col-sm-8">
+					<input id="studentcount" name="studentcount" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">学科ID：</label>
+				<div class="col-sm-8">
+					<input id="subjectId" name="subjectId" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">学科名称：</label>
+				<div class="col-sm-8">
+					<input id="subjectname" name="subjectname" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">开班时间：</label>
+				<div class="col-sm-8">
+					<input id="begintime" name="begintime" readonly="readonly" placeholder="开班时间" class="form-control time-input" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">结课时间：</label>
+				<div class="col-sm-8">
+					<input id="endtime" name="endtime" readonly="readonly" placeholder="基础班毕业时间" class="form-control time-input" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">工作日：</label>
+				<div class="col-sm-8">
+					<input id="workday" name="workday" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">：</label>
+				<div class="col-sm-8">
+					<input id="workdaytime" name="workdaytime" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">班主任名称：</label>
+				<div class="col-sm-8">
+					<input id="headmasterName" name="headmasterName" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">：</label>
+				<div class="col-sm-8">
+					<input id="campusId" name="campusId" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">是否删除(0为true,1为false)：</label>
+				<div class="col-sm-8">
+					<input id="isdelete" name="isdelete" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">是否有效(0为true,1为false)：</label>
+				<div class="col-sm-8">
+					<input id="isvalid" name="isvalid" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">助教名字：</label>
+				<div class="col-sm-8">
+					<input id="assistantname" name="assistantname" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">讲师名字：</label>
+				<div class="col-sm-8">
+					<input id="lecturername" name="lecturername" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">基础班流失率：</label>
+				<div class="col-sm-8">
+					<input id="lossrateone" name="lossrateone" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">就业班流失率：</label>
+				<div class="col-sm-8">
+					<input id="lossratetwo" name="lossratetwo" class="form-control" type="text">
+				</div>
+			</div>
+		</form>
+	</div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "financial/baseClazz"
+		$("#form-baseClazz-add").validate({
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			}
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/add", $('#form-baseClazz-add').serialize());
+	        }
+	    }
+
+
+
+	</script>
+</body>
+</html>

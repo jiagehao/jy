@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jy.system.mapper.BaseAchievementMapper">
+    
+    <resultMap type="BaseAchievement" id="BaseAchievementResult">
+        <result property="id"    column="id"    />
+        <result property="category"    column="category"    />
+        <result property="one"    column="one"    />
+        <result property="two"    column="Two"    />
+        <result property="three"    column="Three"    />
+        <result property="four"    column="Four"    />
+        <result property="five"    column="Five"    />
+        <result property="six"    column="Six"    />
+        <result property="seven"    column="Seven"    />
+        <result property="eight"    column="Eight"    />
+        <result property="nine"    column="Nine"    />
+        <result property="ten"    column="Ten"    />
+        <result property="eleven"    column="Eleven"    />
+        <result property="twelve"    column="Twelve"    />
+        <result property="thirteen"    column="Thirteen"    />
+        <result property="fourteen"    column="Fourteen"    />
+        <result property="fifteen"    column="Fifteen"    />
+        <result property="workexperience"    column="workexperience"    />
+        <result property="stuId"    column="stu_id"    />
+    </resultMap>
+	
+	<sql id="selectBaseAchievementVo">
+        select id, category, one, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Eleven, Twelve, Thirteen, Fourteen, Fifteen, workexperience, stu_id from tb_base_achievement
+    </sql>
+	
+    <select id="selectBaseAchievementList" parameterType="BaseAchievement" resultMap="BaseAchievementResult">
+        <include refid="selectBaseAchievementVo"/>
+        <where>  
+            <if test="id != null  and id != '' "> and id = #{id}</if>
+             <if test="category != null  and category != '' "> and category = #{category}</if>
+             <if test="one != null  and one != '' "> and one = #{one}</if>
+             <if test="two != null  and two != '' "> and Two = #{two}</if>
+             <if test="three != null  and three != '' "> and Three = #{three}</if>
+             <if test="four != null  and four != '' "> and Four = #{four}</if>
+             <if test="five != null  and five != '' "> and Five = #{five}</if>
+             <if test="six != null  and six != '' "> and Six = #{six}</if>
+             <if test="seven != null  and seven != '' "> and Seven = #{seven}</if>
+             <if test="eight != null  and eight != '' "> and Eight = #{eight}</if>
+             <if test="nine != null  and nine != '' "> and Nine = #{nine}</if>
+             <if test="ten != null  and ten != '' "> and Ten = #{ten}</if>
+             <if test="eleven != null  and eleven != '' "> and Eleven = #{eleven}</if>
+             <if test="twelve != null  and twelve != '' "> and Twelve = #{twelve}</if>
+             <if test="thirteen != null  and thirteen != '' "> and Thirteen = #{thirteen}</if>
+             <if test="fourteen != null  and fourteen != '' "> and Fourteen = #{fourteen}</if>
+             <if test="fifteen != null  and fifteen != '' "> and Fifteen = #{fifteen}</if>
+             <if test="workexperience != null  and workexperience != '' "> and workexperience = #{workexperience}</if>
+             <if test="stuId != null  and stuId != '' "> and stu_id = #{stuId}</if>
+         </where>
+    </select>
+    
+    <select id="selectBaseAchievementById" parameterType="String" resultMap="BaseAchievementResult">
+        <include refid="selectBaseAchievementVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertBaseAchievement" parameterType="BaseAchievement">
+        insert into tb_base_achievement
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">id,</if>
+			<if test="category != null  and category != ''  ">category,</if>
+			<if test="one != null  and one != ''  ">one,</if>
+			<if test="two != null  and two != ''  ">Two,</if>
+			<if test="three != null  and three != ''  ">Three,</if>
+			<if test="four != null  and four != ''  ">Four,</if>
+			<if test="five != null  and five != ''  ">Five,</if>
+			<if test="six != null  and six != ''  ">Six,</if>
+			<if test="seven != null  and seven != ''  ">Seven,</if>
+			<if test="eight != null  and eight != ''  ">Eight,</if>
+			<if test="nine != null  and nine != ''  ">Nine,</if>
+			<if test="ten != null  and ten != ''  ">Ten,</if>
+			<if test="eleven != null  and eleven != ''  ">Eleven,</if>
+			<if test="twelve != null  and twelve != ''  ">Twelve,</if>
+			<if test="thirteen != null  and thirteen != ''  ">Thirteen,</if>
+			<if test="fourteen != null  and fourteen != ''  ">Fourteen,</if>
+			<if test="fifteen != null  and fifteen != ''  ">Fifteen,</if>
+			<if test="workexperience != null  and workexperience != ''  ">workexperience,</if>
+			<if test="stuId != null  and stuId != ''  ">stu_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">#{id},</if>
+			<if test="category != null  and category != ''  ">#{category},</if>
+			<if test="one != null  and one != ''  ">#{one},</if>
+			<if test="two != null  and two != ''  ">#{two},</if>
+			<if test="three != null  and three != ''  ">#{three},</if>
+			<if test="four != null  and four != ''  ">#{four},</if>
+			<if test="five != null  and five != ''  ">#{five},</if>
+			<if test="six != null  and six != ''  ">#{six},</if>
+			<if test="seven != null  and seven != ''  ">#{seven},</if>
+			<if test="eight != null  and eight != ''  ">#{eight},</if>
+			<if test="nine != null  and nine != ''  ">#{nine},</if>
+			<if test="ten != null  and ten != ''  ">#{ten},</if>
+			<if test="eleven != null  and eleven != ''  ">#{eleven},</if>
+			<if test="twelve != null  and twelve != ''  ">#{twelve},</if>
+			<if test="thirteen != null  and thirteen != ''  ">#{thirteen},</if>
+			<if test="fourteen != null  and fourteen != ''  ">#{fourteen},</if>
+			<if test="fifteen != null  and fifteen != ''  ">#{fifteen},</if>
+			<if test="workexperience != null  and workexperience != ''  ">#{workexperience},</if>
+			<if test="stuId != null  and stuId != ''  ">#{stuId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateBaseAchievement" parameterType="BaseAchievement">
+        update tb_base_achievement
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="category != null  and category != ''  ">category = #{category},</if>
+            <if test="one != null  and one != ''  ">one = #{one},</if>
+            <if test="two != null  and two != ''  ">Two = #{two},</if>
+            <if test="three != null  and three != ''  ">Three = #{three},</if>
+            <if test="four != null  and four != ''  ">Four = #{four},</if>
+            <if test="five != null  and five != ''  ">Five = #{five},</if>
+            <if test="six != null  and six != ''  ">Six = #{six},</if>
+            <if test="seven != null  and seven != ''  ">Seven = #{seven},</if>
+            <if test="eight != null  and eight != ''  ">Eight = #{eight},</if>
+            <if test="nine != null  and nine != ''  ">Nine = #{nine},</if>
+            <if test="ten != null  and ten != ''  ">Ten = #{ten},</if>
+            <if test="eleven != null  and eleven != ''  ">Eleven = #{eleven},</if>
+            <if test="twelve != null  and twelve != ''  ">Twelve = #{twelve},</if>
+            <if test="thirteen != null  and thirteen != ''  ">Thirteen = #{thirteen},</if>
+            <if test="fourteen != null  and fourteen != ''  ">Fourteen = #{fourteen},</if>
+            <if test="fifteen != null  and fifteen != ''  ">Fifteen = #{fifteen},</if>
+            <if test="workexperience != null  and workexperience != ''  ">workexperience = #{workexperience},</if>
+            <if test="stuId != null  and stuId != ''  ">stu_id = #{stuId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteBaseAchievementById" parameterType="String">
+        delete from tb_base_achievement where id = #{id}
+    </delete>
+
+    <delete id="deleteBaseAchievementByStuId" parameterType="String">
+        delete from tb_base_achievement where stu_id = #{stuId}
+    </delete>
+
+	
+    <delete id="deleteBaseAchievementByIds" parameterType="String">
+        delete from tb_base_achievement where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

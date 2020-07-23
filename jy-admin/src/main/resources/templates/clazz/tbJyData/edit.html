@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('修改报')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-tbJyData-edit" th:object="${tbJyData}">
+            <input id="id" name="id" th:field="*{id}"  type="hidden">
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">所属校区：</label>
+				<div class="col-sm-8">
+					<input id="a" name="a" th:field="*{a}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">品牌：</label>
+				<div class="col-sm-8">
+					<input id="b" name="b" th:field="*{b}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">授课方式：</label>
+				<div class="col-sm-8">
+					<input id="c" name="c" th:field="*{c}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">毕业班级：</label>
+				<div class="col-sm-8">
+					<input id="d" name="d" th:field="*{d}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">班级人数：</label>
+				<div class="col-sm-8">
+					<input id="e" name="e" th:field="*{e}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">有效人数：</label>
+				<div class="col-sm-8">
+					<input id="f" name="f" th:field="*{f}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">毕业时间：</label>
+				<div class="col-sm-8">
+					<input id="g" name="g" th:field="*{g}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">数据更新时间：</label>
+				<div class="col-sm-8">
+					<input id="o2" name="o2" th:field="*{o2}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">当前有效人数：</label>
+				<div class="col-sm-8">
+					<input id="p2" name="p2" th:field="*{p2}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">有效工作日：</label>
+				<div class="col-sm-8">
+					<input id="q2" name="q2" th:field="*{q2}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">就业率：</label>
+				<div class="col-sm-8">
+					<input id="r2" name="r2" th:field="*{r2}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">全班平均薪资：</label>
+				<div class="col-sm-8">
+					<input id="s2" name="s2" th:field="*{s2}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">一线平均薪资：</label>
+				<div class="col-sm-8">
+					<input id="t2" name="t2" th:field="*{t2}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">二线平均薪资：</label>
+				<div class="col-sm-8">
+					<input id="u2" name="u2" th:field="*{u2}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">：</label>
+				<div class="col-sm-8">
+					<input id="o4" name="o4" th:field="*{o4}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">：</label>
+				<div class="col-sm-8">
+					<input id="p4" name="p4" th:field="*{p4}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">：</label>
+				<div class="col-sm-8">
+					<input id="q4" name="q4" th:field="*{q4}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">：</label>
+				<div class="col-sm-8">
+					<input id="r4" name="r4" th:field="*{r4}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">：</label>
+				<div class="col-sm-8">
+					<input id="s4" name="s4" th:field="*{s4}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">：</label>
+				<div class="col-sm-8">
+					<input id="t4" name="t4" th:field="*{t4}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">：</label>
+				<div class="col-sm-8">
+					<input id="u4" name="u4" th:field="*{u4}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">：</label>
+				<div class="col-sm-8">
+					<input id="o6" name="o6" th:field="*{o6}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">：</label>
+				<div class="col-sm-8">
+					<input id="p6" name="p6" th:field="*{p6}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">：</label>
+				<div class="col-sm-8">
+					<input id="q6" name="q6" th:field="*{q6}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">：</label>
+				<div class="col-sm-8">
+					<input id="r6" name="r6" th:field="*{r6}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">：</label>
+				<div class="col-sm-8">
+					<input id="s6" name="s6" th:field="*{s6}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">：</label>
+				<div class="col-sm-8">
+					<input id="t6" name="t6" th:field="*{t6}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">：</label>
+				<div class="col-sm-8">
+					<input id="u6" name="u6" th:field="*{u6}" class="form-control" type="text">
+				</div>
+			</div>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "clazz/tbJyData";
+		$("#form-tbJyData-edit").validate({
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			},
+			focusCleanup: true
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/edit", $('#form-tbJyData-edit').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

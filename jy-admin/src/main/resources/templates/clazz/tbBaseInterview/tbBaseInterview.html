@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.w3.org/1999/xhtml">
+<!--<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">-->
+<!--<link rel="stylesheet" type="text/css" th:href="@{/index.css}">-->
+<head>
+    <th:block th:include="include :: header('学员列表')"/>
+    <link th:href="@{'/ajax/libs/layui/css/layui.css'}" href="../static/ajax/libs/layui/css/layui.css" media="all"
+          rel="stylesheet"/>
+    <script src="/ajax/libs/layui/layui.js" th:src="@{/ajax/libs/layui/layui.js}"></script>
+    <script src="/ajax/libs/module/tableMerge.js" th:src="@{/ajax/libs/module/tableMerge.js}"></script>
+    <script src="../static/ajax/libs/layer/DataTableExtend.js" th:src="@{/ajax/libs/layer/DataTableExtend.js}"></script>
+</head>
+<body class="gray-bg">
+
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <div  style="margin-left: 15px; margin-right: 5px;font-weight:bold" id="subjectName">
+            </div>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group" >
+
+            <div class="col-sm-12 search-collapse">
+                <a class="btn btn-warning" href="javascript:;" onclick="$.operate.join('/clazz/tbBaseClazz')" shiro:hasPermission="clazz:tbBaseClazz:view">
+                    <i class="fa fa-plus"></i> 返回
+                </a>
+            </div>
+        </div>
+
+
+        <div class="col-sm-12 select-table table-striped jtable layui-tab-item layui-show">
+            <!--<table class="table table-bordered" id="bootstrap-table" data-mobile-responsive="true"></table>-->
+            <table id="mergeTable" lay-filter="table"></table>
+            <script type="text/html" id="barDemo">
+                <a class="layui-btn layui-btn-xs layui-btn-radius layui-btn-warm" lay-event="del"
+                   shiro:hasPermission="clazz:tbBaseStudentinfo:remove">删除</a>
+            </script>
+        </div>
+
+    </div>
+</div>
+
+<div th:include="include :: footer"></div>
+
+<script th:inline="javascript">
+    // var removeFlag = [[${@permission.hasPermi('clazz:tbBaseStudentinfo:remove')}]];
+</script>
+
+<style type="text/css">
+    .layui-table-cell {
+        height: auto;
+        line-height: 28px;
+        padding: 0 15px;
+        position: relative;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: normal;
+        box-sizing: border-box;
+
+        /*height:auto;*/
+        /*overflow:visible;*/
+        /*text-overflow:inherit;*/
+        /*white-space:normal;*/
+    }
+
+    #mergeTable .layui-table-cell{
+        height:auto;
+        overflow:visible;
+        text-overflow:inherit;
+        white-space:normal;
+    }
+    .layui-btn{white-space: normal;}
+    .layui-table-cell{white-space: normal;}
+    .laytable-cell-1-0-25{height: 80px;}
+
+
+</style>
+
+<script th:inline="javascript"> var ctx = [[@{
+    /}]]; </script>
+<script type="text/javascript" th:inline="none">
+
+    var prefix = ctx + "clazz/tbBaseInterview";
+
+    //获取地址栏中的值
+    function getUrlParam(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+        var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+        if (r != null) return decodeURI(r[2]);
+        return null; //返回参数值
+    }
+
+    var clazzid = getUrlParam('clazzId');
+
+    var subjectName = getUrlParam('subjectName');
+    var clazzName = getUrlParam('clazzName');
+    $('#subjectName').append('<h3 style="text-align:center">'+subjectName+'&nbsp;&nbsp;'+clazzName+'期'+'&nbsp;&nbsp;三天一访谈记录'+'</h3>')
+    $('#clazzId').append('<input type="hidden" value="' + clazzid + '" name="clazzid">')
+    // $('#formId').append('<input type="hidden" value="'+clazzid+'" name="clazzId">')
+
+
+    layui.use(['table', 'layer', 'element', 'tableMerge'], function () {
+        var table = layui.table,
+            tableMerge = layui.tableMerge;
+        var $ = layui.$
+            , layer = layui.layer
+            , form = layui.form
+        //监听单元格编辑
+        table.on('edit(table)', function (obj) {
+            var value = obj.value //得到修改后的值
+                , data = obj.data //得到所在行所有键值
+                , field = obj.field; //得到字段
+
+            // var regEn = /[`@#$%^&()+<>{}\/'[\]]/im,
+            // // var regEn = /[`!@#$%^&*()_+<>?:"{},.\/;'[\]]/im,
+            //     regCn = /[·！#￥（——）：；“”‘、，|《。》？、【】[\]]/im;
+            // if(regEn.test(value) || regCn.test(value)) {
+            //     layer.msg('输入含有非法字符，请重新输入');
+            //     return false;
+            // }
+
+            $.operate.saveLayer(prefix + "/editBI", data);
+            //修改
+            //refresh(table);
+        });
+
+        //监听工具条 删除
+        table.on('tool(table)', function (obj) {
+
+            var data = obj.data;
+
+            var event = obj.event;
+
+            //删除
+            if (obj.event === 'del') {
+                layer.confirm('需要删除' + '&nbsp;' + data.name + '&nbsp;' + '学生吗', function (index) {
+                    $.operate.saveLayer(prefix + "/remove", {"interviewid": data.interviewid});
+                    //删除学生
+                    layer.close(index);
+                    //刷新
+                    // refresh(table);
+                });
+            }
+
+        });
+        /**
+         * 自动合并表格
+         */
+//        var clazz = getUrlParam('clazzId')
+            //更新表格
+        var index = layer.load(1);
+        table.render({
+            elem: '#mergeTable'
+            // ,id: 'testReload' //区别于table标签的id
+//          , height: 550
+            , url: prefix + "/list"
+            // , toolbar: true
+            , type: "get"
+            , where: {"clazzid": clazzid}
+            //取消分页
+            // , limit: 30
+            // , page: true
+            , cols:
+                [
+                    [
+                        // {type: 'radio', field: "", rowspan: 2,title: '序号',}
+                        , {field: 'name',rowspan: 2,title: '姓名',  minWidth: 120}
+                        , {field: 'sex', rowspan: 2,title: '性别',  minWidth: 60}
+                        , {field: 'age',  rowspan: 2,title: '年龄',  minWidth: 60}
+                        , {field: 'education',  rowspan: 2,title: '学历',  minWidth: 60}
+                        , {field: '', colspan: 2, title: '第一次', align:'center', width: 250}
+                        , {field: '', colspan: 2, title: '第二次', align:'center',width: 250}
+                        , {field: '', colspan: 2, title: '第三次', align:'center',width: 250}
+                        , {field: '', colspan: 2, title: '第四次', align:'center',width: 250}
+                        , {title: '操作',rowspan: 2, align: 'center', toolbar: '#barDemo', minWidth: 60}
+                        , {field: 'interviewid', title: 'interviewid', hide: true}
+                    ]
+                    , [
+                        {field: 'problemOne', edit: 'text', rowspan: 1, title: '问题', minWidth: 125,style:'text-align: left;'}
+                        , {field: 'remarkshrOne', edit: 'text', rowspan: 1, title: '解决方案', minWidth: 125,style:'text-align: left;'}
+                        , {field: 'problemTow', edit: 'text', rowspan: 1,align:'left', title: '问题', minWidth: 125,style:'text-align: left;'}
+                        , {field: 'remarkshrTow', edit: 'text', rowspan: 1,align:'left', title: '解决方案', minWidth: 125,style:'text-align: left;'}
+                        , {field: 'problemThree', edit: 'text', rowspan: 1, align:'left',title: '问题', minWidth: 125,style:'text-align: left;'}
+                        , {field: 'remarkshrThree', edit: 'text', rowspan: 1, align:'left',title: '解决方案', minWidth: 125,style:'text-align: left;'}
+                        , {field: 'problemFour', edit: 'text', rowspan: 1,align:'left', title: '问题', minWidth: 125,style:'text-align: left;'}
+                        , {field: 'remarkshrFour', edit: 'text', rowspan: 1, align:'left',title: '解决方案', minWidth: 125,style:'text-align: left;'}
+                    ]
+                ]
+
+            , done: function (res, curr, count) {
+
+                layer.close(index);    //返回数据关闭loading
+
+
+            }// end
+        });
+
+
+    })
+
+</script>
+
+</body>
+</html>
